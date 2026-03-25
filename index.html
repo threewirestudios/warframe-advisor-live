@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Warframe Advisor — Codex Build System v0.78 Beta</title>
+  <title>Warframe Advisor — Codex Build System v0.79 Beta</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Electrolize&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
@@ -186,7 +186,7 @@
   <div class="gate-card">
     <div class="gate-eyebrow">◈ Tenno Access Required</div>
     <div class="gate-title">WARFRAME<br>CODEX <span>ADVISOR</span></div>
-    <div class="gate-subtitle">CODEX-POWERED BUILD SYSTEM &nbsp;·&nbsp; v0.78 Beta</div>
+    <div class="gate-subtitle">CODEX-POWERED BUILD SYSTEM &nbsp;·&nbsp; v0.79 Beta</div>
 
     <div class="gate-label">Anthropic API Key</div>
     <input
@@ -397,7 +397,7 @@ window.__BUNDLED_WEAPONS__ = [
   // Primary — Shotguns
   "Arca Plasmor","Astilla","Astilla Prime","Boar","Boar Prime","Convectrix","Corinth","Corinth Prime","Drakgoon","Exergis","Hek","Kohm","Kuva Hek","Phage","Phantasma","Phantasma Prime","Sancti Tigris","Sobek","Strun","Strun Prime","Tenet Arca Plasmor","Tigris","Tigris Prime","Vaykor Hek",
   // Primary — Rifles / Snipers
-  "Acceltra","Acceltra Prime","Amprex","Argonak","Baza","Baza Prime","Boltor","Boltor Prime","Braton","Braton Prime","Braton Vandal","Cedo","Cinta","Dera","Dera Vandal","Felarx","Fulmin","Glaxion","Glaxion Vandal","Grakata","Grinlok","Ignis","Ignis Wraith","Karak","Karak Wraith","Kuva Chakkhurr","Kuva Karak","Kuva Kohm","Kuva Tonkor","Laetum","Lanka","Latron","Latron Prime","Latron Wraith","Opticor","Opticor Vandal","Phenmor","Prisma Grakata","Quanta","Quanta Vandal","Rubico","Rubico Prime","Scourge","Scourge Prime","Soma","Soma Prime","Sporothrix","Stahlta","Stradavar","Stradavar Prime","Supra","Supra Vandal","Sybaris","Sybaris Prime","Synapse","Tenora","Tenora Prime","Tenet Flux Rifle","Tenet Tetra","Tiberon","Tiberon Prime","Torid","Trumna","Vectis","Vectis Prime","Veldt","Vermisplicer",
+  "Acceltra","Acceltra Prime","Amprex","Argonak","Baza","Baza Prime","Boltor","Boltor Prime","Braton","Braton Prime","Braton Vandal","Cedo","Cinta","Dera","Dera Vandal","Enkaus","Felarx","Fulmin","Glaxion","Glaxion Vandal","Grakata","Grinlok","Ignis","Ignis Wraith","Karak","Karak Wraith","Kuva Chakkhurr","Kuva Karak","Kuva Kohm","Kuva Tonkor","Laetum","Lanka","Latron","Latron Prime","Latron Wraith","Opticor","Opticor Vandal","Phenmor","Prisma Grakata","Quanta","Quanta Vandal","Rubico","Rubico Prime","Scourge","Scourge Prime","Soma","Soma Prime","Sporothrix","Stahlta","Stradavar","Stradavar Prime","Supra","Supra Vandal","Sybaris","Sybaris Prime","Synapse","Tenora","Tenora Prime","Tenet Flux Rifle","Tenet Quanta","Tenet Tetra","Tiberon","Tiberon Prime","Torid","Trumna","Vectis","Vectis Prime","Veldt","Vermisplicer",
   // Primary — Launchers
   "Kuva Bramma","Kuva Ogris","Lenz","Ogris","Tonkor","Zarr",
   // Primary — Zariman / Special
@@ -425,7 +425,7 @@ window.__BUNDLED_WEAPONS__ = [
   // Melee — Staves / Nunchaku
   "Bo","Bo Prime","Dragon Nikana","Shaku","Vitrica","Zaw (custom)",
   // Melee — Axes / Heavy Blades
-  "Nami Solo","Pulmonars","Tatsu","Tatsu Prime","Tekko","Tekko Prime","Tenet Agendus","Vastilok",
+  "Ghoulsaw","Kuva Ghoulsaw","Nami Solo","Pulmonars","Tatsu","Tatsu Prime","Tekko","Tekko Prime","Tenet Agendus","Vastilok",
   // Incarnon genesis weapons
   "Angstrum","Boltor","Braton","Ceramic Dagger","Dark Sword","Dual Ichor","Felarx","Furax","Gorgon","Lex","Laetum","Mire","Nikana","Phenmor","Skana","Strun","Torid",
   // Companions (for companion weapon flow)
@@ -434,7 +434,7 @@ window.__BUNDLED_WEAPONS__ = [
   "Medjay Predasite","Pharaoh Predasite","Vizier Predasite","Panzer Vulpaphyla","Sly Vulpaphyla","Crescent Vulpaphyla",
   "Lambeo MOA","Oloro MOA","Para MOA",
   // Coda weapons (Warframe 1999 / Techrot Encore)
-  "Coda Bassocyst","Coda Caustacyst","Coda Catabolyst","Coda Hema","Coda Hirudo","Coda Mire","Coda Motovore","Coda Pathocyst","Coda Pox","Coda Sporothrix","Coda Synapse","Coda Tysis","Dual Coda Torxica"
+  "Coda Bassocyst","Coda Bubonico","Coda Caustacyst","Coda Catabolyst","Coda Hema","Coda Hirudo","Coda Mire","Coda Motovore","Coda Pathocyst","Coda Pox","Coda Sporothrix","Coda Synapse","Coda Tysis","Dual Coda Torxica"
 ];;
 window.__BUNDLED_COMPANIONS__ = [
   "Carrier","Carrier Prime","Dethcube","Dethcube Prime","Diriga","Djinn",
@@ -3032,7 +3032,7 @@ function getRivenPriorities(weaponType, weaponName, buildStyle) {
   const isShotgun = /\b(kohm|boar|astilla|corinth|hek|tigris|sobek|strun|arca plasmor|phantasma|drakgoon|convectrix|exergis|cedo|felarx|zarr)\b/.test(wn) || wn.includes("shotgun");
   const isBow     = /\b(daikyu|cernos|paris|artemis|bramma|nataruk|zhuge)\b/.test(wn) || wn.includes("bow");
   const isSniper  = /\b(rubico|vectis|komorex|lanka|vulkar|knell|zymos|nagantaka|sporothrix)\b/.test(wn) || wn.includes("sniper");
-  const isBeam    = /\b(nukor|gammacor|flux|quanta|ignis|torid|atomos|bubonico)\b/.test(wn) || wn.includes("beam");
+  const isBeam    = /\b(nukor|gammacor|flux|quanta|ignis|torid|atomos|bubonico|enkaus)\b/.test(wn) || wn.includes("beam");
   const isMelee   = weaponType === "Melee";
   const isSec     = weaponType === "Secondary";
   const isGlaive  = /\b(glaive|xoris|falcor|orvius|pathocyst|kestrel|cerata|halikar)\b/.test(wn);
@@ -3059,6 +3059,7 @@ function getRivenPriorities(weaponType, weaponName, buildStyle) {
     if (statusStyle) return { ideal: ["Status Chance","Crit Chance","Damage","Attack Speed"], avoid: ["Finisher Damage","Combo Duration"], note: "+Status Chance then +Crit Chance -- CO proc count matters more than raw crit. +Range is a bonus." };
     return { ideal: ["Crit Chance","Crit Damage","Attack Speed","Damage"], avoid: ["Finisher Damage","Combo Duration"], note: "+Crit Chance scales Blood Rush combo multiplier -- it is the core scaling stat." };
   }
+    if (wn.includes("enkaus")) return { ideal: ["Status Chance","Multishot","Damage","Crit Chance"], avoid: ["Reload Speed","Zoom"], note: "Enkaus ink siphon reloads automatically by shooting inked enemies -- +Reload Speed is wasted. Status Chance drives ink application and pushes enemies into the 35% execute window faster. Fire Rate is viable (more beam ticks = faster ink siphon cycling)." };
   if (isBeam) return { ideal: ["Crit Chance","Damage","Status Chance","Multishot"], avoid: ["Fire Rate","Reload Speed"], note: "+Crit Chance/+Status Chance hybrid with +Damage. -Fire Rate is wasteful on beams." };
   if (isBow)  return { ideal: ["Crit Chance","Crit Damage","Damage","Fire Rate"], avoid: ["Zoom","Recoil"], note: "+Crit Chance + +Crit Damage are priority. -Zoom is a clean desirable dump stat." };
   if (isSniper) return { ideal: ["Crit Chance","Crit Damage","Damage","Multishot"], avoid: ["Zoom","Recoil","Reload Speed"], note: "+Multishot is rare and extremely valuable on snipers. -Zoom wastes a line." };
