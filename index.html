@@ -884,6 +884,7 @@ const HELMINTH_ABILITIES = [
   { name:"Infested Mobility",  frame:"Baruuk",           type:"buff",         helminthOnly:false, desc:"Grants sprint speed + parkour velocity for a short time.",                                                                    synergy:"Niche speed buff. Not a popular helminth pick." },
   { name:"Thermal Sunder",     frame:"Grendel",          type:"cc_strip",     helminthOnly:false, desc:"AoE Heat or Cold proc + armor strip. Heat mode strips armor; Cold mode freezes enemies.",                                     synergy:"Budget armor strip + status. Good when Shuriken is overkill. Baruuk, Revenant." },
   { name:"Neutralizer",        frame:"Cyte-09",          type:"utility",      helminthOnly:false, desc:"Exalted sniper. Not helminth-useful outside of Cyte-09.",                                                                     synergy:"Not subsumed in practice." },
+  { name:"Evade",              frame:"Cyte-09",          type:"utility",      helminthOnly:false, desc:"Dash backward 5m, become Invisible for 10s, cleanse all Status Effects, and bypass Shield regen delay. Weak point kills extend duration by 2s (cap 30s on Cyte-09). Subsumed: base 10s, cap 25s. Can be maintained indefinitely with consistent precision kills.", synergy:"Reliable invisibility + status cleanse on any frame. Duration scales with precision kills — strong on sniper/crit builds or frames that consistently hit weak points. Popular survivability subsume." },
   { name:"Tragedy",            frame:"Dante",            type:"nuke",         helminthOnly:false, desc:"Detonates all status procs on nearby enemies for massive damage.",                                                            synergy:"Insane AoE nuke if you can build status stacks first. Saryn, Ember, Nidus." },
   { name:"Radial Blind",       frame:"Excalibur",        type:"cc",           helminthOnly:false, desc:"AoE blind -- enemies stop attacking for duration. Line-of-sight cone.",                                                       synergy:"Strong survivability CC. Frames needing breathing room. Pairs with Melee finisher builds." },
   { name:"Splinter Storm",     frame:"Gara",             type:"buff_defense", helminthOnly:false, desc:"Stacking glass shards buff -- damage reduction + reflects damage to attackers.",                                              synergy:"Top-tier survivability on tanky frames. Reduces damage taken multiplicatively with stacks." },
@@ -2570,13 +2571,13 @@ HELMINTH: Replace Spectral Scream or Effigy. Vex Armor and Elemental Ward are ma
 
   "cyte-09": `CYTE-09 KIT (Neutralizer Exalted/Warframe 1999):
 Passive: Headshots generate bonus ammo and improve ammo efficiency.
-1 - Neutralizer: EXALTED primary weapon (rapid-fire SMG); scales with primary weapon mods; high status-focused fire rate. Core damage ability.
+1 - Evade (HELMINTH): Dash backward 5m, become Invisible for 10s, cleanse all Status Effects, bypass Shield regen delay. Weak point kills extend duration by 2s (cap 30s). Maintain indefinitely with consistent precision kills. Subsumed on other frames: base 10s, cap 25s.
 2 - Slip Detonator: Deploys sticky AoE bomb; detonates on contact or delay. Solid supplemental AoE.
 3 - Overdrive: Burst mode -- amplifies Neutralizer fire rate and damage for a short window. Cast before sustained fire for DPS spike.
-4 - Emergency Exit: Deploys decoy escape pod attracting fire; Cyte-09 gains brief invulnerability window. Emergency survival tool.
-KEY STATS: Strength (Overdrive amp magnitude, Neutralizer damage), Duration (Overdrive window length), Range (Slip Detonator blast radius).
-ABILITY LOOP: Cast Overdrive for damage amp -> fire Neutralizer during window for burst DPS -> Slip Detonator for AoE supplemental damage. Emergency Exit for invulnerability emergency.
-HELMINTH: Replace Emergency Exit or Slip Detonator. Neutralizer (exalted weapon) and Overdrive (amp) are the core abilities.`,
+4 - Neutralizer: EXALTED primary weapon (rapid-fire SMG); scales with primary weapon mods; high status-focused fire rate. Core damage ability.
+KEY STATS: Strength (Overdrive amp magnitude, Neutralizer damage), Duration (Evade invisibility uptime, Overdrive window), Range (Slip Detonator blast radius).
+ABILITY LOOP: Evade for invisibility sustain + status cleanse -> Overdrive for damage amp -> fire Neutralizer during window for burst DPS -> Slip Detonator for AoE supplemental damage. Precision/weak point kills keep Evade rolling indefinitely.
+HELMINTH: Evade is Cyte-09's subsumable ability -- popular invisibility subsume for frames needing status cleanse + stealth. Replace Slip Detonator or Overdrive on Cyte-09 himself. Neutralizer (exalted weapon) is always kept.`,
 
   "dagath": `DAGATH KIT (Fear/Slash Damage):
 Passive: Wyrd Scythes orbit Dagath; enemies that flee from Dagath take bonus damage.
