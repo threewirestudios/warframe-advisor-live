@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Warframe Advisor — Codex Build System v0.79 Beta</title>
+  <title>Warframe Advisor — Codex Build System v0.80 Beta</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Electrolize&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
@@ -186,7 +186,7 @@
   <div class="gate-card">
     <div class="gate-eyebrow">◈ Tenno Access Required</div>
     <div class="gate-title">WARFRAME<br>CODEX <span>ADVISOR</span></div>
-    <div class="gate-subtitle">CODEX-POWERED BUILD SYSTEM &nbsp;·&nbsp; v0.79 Beta</div>
+    <div class="gate-subtitle">CODEX-POWERED BUILD SYSTEM &nbsp;·&nbsp; v0.80 Beta</div>
 
     <div class="gate-label">Anthropic API Key</div>
     <input
@@ -5735,18 +5735,20 @@ function SavedRivenPicker({ weaponName, savedRivens, onPick }) {
 
 
 function RivenComparator({ onBack, apiKey, wfcdWeapons = [], savedRivens = [], onSaveRivens }) {
-  var emptyStats = function() { return [{sign:"+",name:"",value:""},{sign:"+",name:"",value:""},{sign:"+",name:"",value:""},{sign:"+",name:"",value:""}]; };
-  var statsToString = function(stats) { return stats.filter(function(s){return s.name.trim();}).map(function(s){return s.sign+(s.value?s.value+"% ":"")+s.name.trim();}).join("\n"); };
+  var emptyStats = function() { return [{sign:"+",name:"",value:"",mode:"pct"},{sign:"+",name:"",value:"",mode:"pct"},{sign:"+",name:"",value:"",mode:"pct"},{sign:"+",name:"",value:"",mode:"pct"}]; };
+  var statsToString = function(stats) { return stats.filter(function(s){return s.name.trim();}).map(function(s){return s.sign+(s.value?(s.mode==="mult"?"x"+s.value+" ":s.value+"% "):"")+s.name.trim();}).join("\n"); };
   var parseStatsString = function(str) {
     var lines = (str||"").split("\n").map(function(l){return l.trim();}).filter(Boolean);
     return [0,1,2,3].map(function(i){
       var line = lines[i];
-      if (!line) return {sign:"+",name:"",value:""};
+      if (!line) return {sign:"+",name:"",value:"",mode:"pct"};
       var sign = line[0]==="-"?"-":"+";
       var rest = line.replace(/^[+-]/,"").trim();
       var m = rest.match(/^([\d.]+)%\s*(.+)$/);
-      if(m) return {sign:sign,value:m[1],name:m[2]};
-      return {sign:sign,name:rest,value:""};
+      if(m) return {sign:sign,value:m[1],name:m[2],mode:"pct"};
+      var mx = rest.match(/^x([\d.]+)\s*(.+)$/i);
+      if(mx) return {sign:sign,value:mx[1],name:mx[2],mode:"mult"};
+      return {sign:sign,name:rest,value:"",mode:"pct"};
     });
   };
 
@@ -5760,6 +5762,7 @@ function RivenComparator({ onBack, apiKey, wfcdWeapons = [], savedRivens = [], o
   const [priceData, setPriceData]       = useState(null);
   const [priceLoading, setPriceLoading] = useState(false);
   const [priceError, setPriceError]     = useState(null);
+  const [streamText, setStreamText]     = useState("");
 
   const canCompare = weapon.trim() && statsA.some(function(s){return s.name.trim();}) && statsB.some(function(s){return s.name.trim();});
 
@@ -5774,7 +5777,7 @@ function RivenComparator({ onBack, apiKey, wfcdWeapons = [], savedRivens = [], o
                 placeholder:"Stat name", style:{ flex:1, background:"#060e1a", border:"1px solid #1a304a", borderRadius:4, color:"#c8e0f0", padding:"5px 8px", fontSize:11, fontFamily:"monospace" } })
             , React.createElement("input", { value:st.value, onChange:function(e){ var v=e.target.value; var cap=ri; setStats(function(prev){return prev.map(function(s,i){return i===cap?Object.assign({},s,{value:v}):s;}); }); },
                 placeholder:"0.0", style:{ width:52, background:"#060e1a", border:"1px solid #1a304a", borderRadius:4, color:"#c8e0f0", padding:"5px 6px", fontSize:11, fontFamily:"monospace", textAlign:"right" } })
-            , React.createElement("div", { style:{ color:"#6a9fc8", fontSize:11, minWidth:12 } }, "%")
+            , React.createElement("button", { onClick:function(){ var cap=ri; setStats(function(prev){return prev.map(function(s,i){return i===cap?Object.assign({},s,{mode:s.mode==="mult"?"pct":"mult"}):s;}); }); }, style:{ minWidth:26, height:28, background:st.mode==="mult"?"#ffaa0022":"transparent", border:"1px solid "+(st.mode==="mult"?"#ffaa0055":"#2a4060"), borderRadius:4, color:st.mode==="mult"?"#ffaa44":"#6a9fc8", fontWeight:700, fontSize:10, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontFamily:"monospace" } }, st.mode==="mult"?"×":"%")
           );
         })
     );
@@ -5805,7 +5808,7 @@ function RivenComparator({ onBack, apiKey, wfcdWeapons = [], savedRivens = [], o
 
   async function compare() {
     if (!canCompare) return;
-    setLoading(true); setResult(null); setError(null);
+    setLoading(true); setResult(null); setError(null); setStreamText("");
     var rivenAStr = statsToString(statsA);
     var rivenBStr = statsToString(statsB);
     const system = "You are an expert Warframe riven advisor. Compare two riven mods for the same weapon and give a structured verdict.\n\nRespond ONLY with valid JSON, no markdown, no preamble. Schema:\n{\"winner\":\"A|B|Tie\",\"verdict\":\"2-3 sentence plain-english summary\",\"scoreA\":0-100,\"scoreB\":0-100,\"rivenALabel\":\"short 3-5 word label\",\"rivenBLabel\":\"short 3-5 word label\",\"pros_A\":[\"up to 3 pros\"],\"cons_A\":[\"up to 3 cons\"],\"pros_B\":[\"up to 3 pros\"],\"cons_B\":[\"up to 3 cons\"],\"keep_if_A\":\"one sentence: when pick A\",\"keep_if_B\":\"one sentence: when pick B\",\"sell_advice\":\"one sentence: is either worth selling, rough plat delta\"}";
@@ -5843,7 +5846,7 @@ function RivenComparator({ onBack, apiKey, wfcdWeapons = [], savedRivens = [], o
               return React.createElement("div", { key:label }
                 , React.createElement("div", { style:{ fontSize:11, color:color, fontFamily:"monospace", letterSpacing:"0.1em", fontWeight:700, marginBottom:6 } }, "RIVEN "+label)
                 , React.createElement(SavedRivenPicker, { weaponName:weapon, savedRivens:savedRivens, onPick:function(str){ setStats(parseStatsString(str)); } })
-                , React.createElement("div", { style:{ fontSize:10, color:"#4a7898", marginBottom:4 } }, "Toggle +/- per line, enter stat name and value %")
+                , React.createElement("div", { style:{ fontSize:10, color:"#4a7898", marginBottom:4 } }, "Toggle +/- and %/\xd7 per line")
                 , makeStatRows(stats, setStats, color)
               );
             })
@@ -5855,6 +5858,10 @@ function RivenComparator({ onBack, apiKey, wfcdWeapons = [], savedRivens = [], o
             , loading?"ANALYZING...":"COMPARE RIVENS")
         )
         , error && React.createElement("div", { style:{ marginTop:16, color:"#ff7777", fontSize:12 } }, error)
+        , loading && streamText && React.createElement("div", { style:{ marginTop:16, background:"#060e1a", border:"1px solid #1a304a", borderRadius:6, padding:"12px 16px" } }
+          , React.createElement("div", { style:{ fontSize:9, color:"#00d4aa", letterSpacing:"0.12em", marginBottom:4, fontFamily:"monospace" } }, "ANALYZING\u2026")
+          , React.createElement("div", { style:{ fontSize:10, color:"#3a5a78", fontFamily:"monospace", maxHeight:80, overflow:"hidden", lineHeight:1.4, whiteSpace:"pre-wrap", wordBreak:"break-all" } }, streamText)
+        )
       )
 
       , result && (
@@ -5998,7 +6005,7 @@ function WarframeAdvisor() {
   const [innateElement, setInnateElement] = useState("");
   const [innateBonus, setInnateBonus] = useState("");
   const [rivenEvalWeapon, setRivenEvalWeapon] = useState("");
-  const [rivenEvalStats, setRivenEvalStats] = useState([{sign:"+",name:"",value:""},{sign:"+",name:"",value:""},{sign:"+",name:"",value:""},{sign:"+",name:"",value:""}]);
+  const [rivenEvalStats, setRivenEvalStats] = useState([{sign:"+",name:"",value:"",mode:"pct"},{sign:"+",name:"",value:"",mode:"pct"},{sign:"+",name:"",value:"",mode:"pct"},{sign:"+",name:"",value:"",mode:"pct"}]);
   const [compType, setCompType] = useState("");
   const [compRole, setCompRole] = useState("");
   const [evalText, setEvalText] = useState("");
@@ -6390,7 +6397,7 @@ ${allCompMods.join("\n") || "No mods entered"}
 Context/Goals: ${s.notes || "general Steel Path"}`;
         } else if (et === "Riven") {
           systemPrompt = RIVEN_EVAL_PROMPT;
-          var rivenStatLines = (s.rivenEvalStats || []).filter(function(st) { return st.name.trim(); }).map(function(st) { return st.sign + (st.value ? st.value + "% " : "") + st.name.trim(); }).join("\n");
+          var rivenStatLines = (s.rivenEvalStats || []).filter(function(st) { return st.name.trim(); }).map(function(st) { return st.sign + (st.value ? (st.mode === "mult" ? "x" + st.value + " " : st.value + "% ") : "") + st.name.trim(); }).join("\n");
           setEvalBuildData({ weapon: s.rivenEvalWeapon, type: "Riven" });
           prompt = "Evaluate this riven mod for: " + s.rivenEvalWeapon + "\n\nRiven stats:\n" + rivenStatLines + "\n\nBuild style: " + (s.buildStyle || "balanced") + "\nContext: " + (s.notes || "general Steel Path");
 } else {
@@ -6967,14 +6974,14 @@ ${styleCtx}`;
                   , React.createElement(NameAutocomplete, { list: wfcdWeapons, value: rivenEvalWeapon, onChange: setRivenEvalWeapon, placeholder: "e.g. Kuva Nukor, Rubico Prime, Nikana Prime..." })
                 )
                 , React.createElement("div", { style: { marginBottom: 14 } }
-                  , React.createElement("div", { style: { fontSize: 11, color: "#6a9fc8", marginBottom: 6 } }, "Riven Stats  ", React.createElement("span", { style: { color: "#4a7898", fontSize: 10 } }, "Toggle +/- per line, enter stat name and value %"))
+                  , React.createElement("div", { style: { fontSize: 11, color: "#6a9fc8", marginBottom: 6 } }, "Riven Stats  ", React.createElement("span", { style: { color: "#4a7898", fontSize: 10 } }, "Toggle +/- and %/\xd7 per line"))
                   , React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8 } }
                     , rivenEvalStats.map(function(st, ri) {
                         return React.createElement("div", { key: ri, style: { display: "flex", gap: 6, alignItems: "center" } }
                           , React.createElement("button", { onClick: function() { var captured = ri; setRivenEvalStats(function(prev) { return prev.map(function(s, i) { return i === captured ? Object.assign({}, s, { sign: s.sign === "+" ? "-" : "+" }) : s; }); }); }, style: { minWidth: 34, height: 34, background: st.sign === "-" ? "#ff444422" : "#00d4aa22", border: "1px solid " + (st.sign === "-" ? "#ff444455" : "#00d4aa55"), borderRadius: 4, color: st.sign === "-" ? "#ff6666" : "#00d4aa", fontWeight: 900, fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, st.sign)
                           , React.createElement("input", { value: st.name, onChange: function(e) { var v = e.target.value; var captured = ri; setRivenEvalStats(function(prev) { return prev.map(function(s, i) { return i === captured ? Object.assign({}, s, { name: v }) : s; }); }); }, placeholder: "Stat name (e.g. Critical Chance)", style: { flex: 1, background: "#060e1a", border: "1px solid #1a304a", borderRadius: 4, color: "#c8e0f0", padding: "6px 10px", fontSize: 12, fontFamily: "monospace" } })
                           , React.createElement("input", { value: st.value, onChange: function(e) { var v = e.target.value; var captured = ri; setRivenEvalStats(function(prev) { return prev.map(function(s, i) { return i === captured ? Object.assign({}, s, { value: v }) : s; }); }); }, placeholder: "0.0", style: { width: 64, background: "#060e1a", border: "1px solid #1a304a", borderRadius: 4, color: "#c8e0f0", padding: "6px 8px", fontSize: 12, fontFamily: "monospace", textAlign: "right" } })
-                          , React.createElement("div", { style: { color: "#6a9fc8", fontSize: 12, minWidth: 14 } }, "%")
+                          , React.createElement("button", { onClick: function() { var captured = ri; setRivenEvalStats(function(prev) { return prev.map(function(s, i) { return i === captured ? Object.assign({}, s, { mode: s.mode === "mult" ? "pct" : "mult" }) : s; }); }); }, style: { minWidth: 28, height: 30, background: st.mode === "mult" ? "#ffaa0022" : "transparent", border: "1px solid " + (st.mode === "mult" ? "#ffaa0055" : "#2a4060"), borderRadius: 4, color: st.mode === "mult" ? "#ffaa44" : "#6a9fc8", fontWeight: 700, fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontFamily: "monospace" } }, st.mode === "mult" ? "\xd7" : "%")
                         );
                       })
                   )
