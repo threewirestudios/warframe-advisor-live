@@ -7282,12 +7282,55 @@ ${styleCtx}`;
                     )
                   )
                 )
-                , React.createElement('div', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 4148}}
-                  , React.createElement(SavedRivenPicker, { weaponName: weaponSearch, savedRivens: savedRivens, onPick: (stats) => setRivenStats(stats) })
-                  , React.createElement('div', { style: { fontSize: 11, color: "#6a9fc8", marginBottom: 6 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4149}}, "Owned Riven Stats (optional)"   )
-                  , React.createElement('input', { value: rivenStats, onChange: e => setRivenStats(e.target.value), placeholder: "e.g. +187% Crit Chance, +98% Damage, -60% Zoom"       ,
-                    style: { width: "100%", background: "#060e1a", border: "1px solid #1a3050", borderRadius: 8, color: "#c8e0f0", padding: "9px 12px", fontSize: 13, outline: "none" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4150}} )
-                )
+                                , React.createElement('div', { style: { marginTop: 12 } }
+          , React.createElement('div', { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 4 } }
+            , React.createElement('div', { style: { fontSize: 11, color: "#aa44ff" } }, "Owned Riven?")
+            , React.createElement('div', { style: { display: "flex", gap: 4 } }
+              , [false, true].map(function(v) {
+                  return React.createElement('button', { key: String(v), onClick: function() { setWeaponHasRiven(v); if (!v) setRivenStats(""); },
+                    style: { background: weaponHasRiven === v ? (v ? "#aa44ff22" : "#1a3050") : "#060e1a",
+                      border: "1px solid " + (weaponHasRiven === v ? (v ? "#aa44ff" : "#6a9fc8") : "#1a3050"),
+                      borderRadius: 4, color: weaponHasRiven === v ? (v ? "#aa44ff" : "#c8e0f0") : "#4a7898",
+                      padding: "4px 12px", cursor: "pointer", fontSize: 11, fontWeight: weaponHasRiven === v ? 700 : 400 }
+                  }, v ? "\u25c6 Yes" : "No");
+                })
+            )
+          )
+          , weaponHasRiven && React.createElement('div', { style: { background: "#060e1a", border: "1px solid #aa44ff22", borderRadius: 8, padding: "10px 14px" } }
+            , React.createElement(SavedRivenPicker, { weaponName: weaponSearch, savedRivens: savedRivens, onPick: function(str) {
+                var lines = (str || "").split("\n").map(function(l) { return l.trim(); }).filter(Boolean);
+                var rows = [0,1,2,3].map(function(i) {
+                  var line = lines[i];
+                  if (!line) return {sign:"+", name:"", value:"", mode:"pct"};
+                  var sign = line[0] === "-" ? "-" : "+";
+                  var rest = line.replace(/^[+-]/, "").trim();
+                  var mp = rest.match(/^([\d.]+)%\s*(.+)$/);
+                  if (mp) return {sign:sign, value:mp[1], name:mp[2], mode:"pct"};
+                  var mx = rest.match(/^x([\d.]+)\s*(.+)$/i);
+                  if (mx) return {sign:sign, value:mx[1], name:mx[2], mode:"mult"};
+                  return {sign:sign, name:rest, value:"", mode:"pct"};
+                });
+                setWeaponRivenRows(rows);
+                var str2 = rows.filter(function(s){return s.name.trim();}).map(function(s){return s.sign+(s.value?(s.mode==="mult"?"x"+s.value+" ":s.value+"% "):"")+s.name.trim();}).join(", ");
+                setRivenStats(str2);
+              }})
+            , React.createElement('div', { style: { fontSize: 10, color: "#4a7898", marginBottom: 8 } }, "Toggle +/- and %/\xd7 per line")
+            , React.createElement('div', { style: { display: "flex", flexDirection: "column", gap: 8 } }
+              , weaponRivenRows.map(function(st, ri) {
+                  return React.createElement('div', { key: ri, style: { display: "flex", gap: 6, alignItems: "center" } }
+                    , React.createElement('button', { onClick: function() { var cap = ri; setWeaponRivenRows(function(prev) { var next = prev.map(function(s, i) { return i === cap ? Object.assign({}, s, {sign: s.sign === "+" ? "-" : "+"}) : s; }); var str = next.filter(function(s){return s.name.trim();}).map(function(s){return s.sign+(s.value?(s.mode==="mult"?"x"+s.value+" ":s.value+"% "):"")+s.name.trim();}).join(", "); setRivenStats(str); return next; }); },
+                      style: { minWidth: 34, height: 34, background: st.sign === "-" ? "#ff444422" : "#00d4aa22", border: "1px solid " + (st.sign === "-" ? "#ff444455" : "#00d4aa55"), borderRadius: 4, color: st.sign === "-" ? "#ff6666" : "#00d4aa", fontWeight: 900, fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, st.sign)
+                    , React.createElement('input', { value: st.name, onChange: function(e) { var v = e.target.value; var cap = ri; setWeaponRivenRows(function(prev) { var next = prev.map(function(s, i) { return i === cap ? Object.assign({}, s, {name: v}) : s; }); var str = next.filter(function(s){return s.name.trim();}).map(function(s){return s.sign+(s.value?(s.mode==="mult"?"x"+s.value+" ":s.value+"% "):"")+s.name.trim();}).join(", "); setRivenStats(str); return next; }); },
+                      placeholder: "Stat name (e.g. Critical Chance)", style: { flex: 1, background: "#060e1a", border: "1px solid #1a304a", borderRadius: 4, color: "#c8e0f0", padding: "6px 10px", fontSize: 12, fontFamily: "monospace" } })
+                    , React.createElement('input', { value: st.value, onChange: function(e) { var v = e.target.value; var cap = ri; setWeaponRivenRows(function(prev) { var next = prev.map(function(s, i) { return i === cap ? Object.assign({}, s, {value: v}) : s; }); var str = next.filter(function(s){return s.name.trim();}).map(function(s){return s.sign+(s.value?(s.mode==="mult"?"x"+s.value+" ":s.value+"% "):"")+s.name.trim();}).join(", "); setRivenStats(str); return next; }); },
+                      placeholder: "0.0", style: { width: 64, background: "#060e1a", border: "1px solid #1a304a", borderRadius: 4, color: "#c8e0f0", padding: "6px 8px", fontSize: 12, fontFamily: "monospace", textAlign: "right" } })
+                    , React.createElement('button', { onClick: function() { var cap = ri; setWeaponRivenRows(function(prev) { var next = prev.map(function(s, i) { return i === cap ? Object.assign({}, s, {mode: s.mode === "mult" ? "pct" : "mult"}) : s; }); var str = next.filter(function(s){return s.name.trim();}).map(function(s){return s.sign+(s.value?(s.mode==="mult"?"x"+s.value+" ":s.value+"% "):"")+s.name.trim();}).join(", "); setRivenStats(str); return next; }); },
+                      style: { minWidth: 28, height: 30, background: st.mode === "mult" ? "#ffaa0022" : "transparent", border: "1px solid " + (st.mode === "mult" ? "#ffaa0055" : "#2a4060"), borderRadius: 4, color: st.mode === "mult" ? "#ffaa44" : "#6a9fc8", fontWeight: 700, fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontFamily: "monospace" } }, st.mode === "mult" ? "\xd7" : "%")
+                  );
+                })
+            )
+          )
+        )
                 /* Incarnon toggle + evolution choices */
                 , weaponType && React.createElement('div', { style: { marginTop: 8, background: "#060e1a", border: "1px solid #1a3050", borderRadius: 8, padding: "8px 12px" } }
                   , React.createElement('div', { style: { fontSize: 10, color: "#6a9fc8", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 6 } }, "Riven Priority Hint")
