@@ -6496,7 +6496,7 @@ ${styleCtx}`;
       const label = parsed.frame || parsed.weapon || parsed.companion || parsed.mission_type || "Build";
       await addToHistory(parsed, type, label);
     } catch (e) {
-      setError("Build generation failed: " + e.message);
+      setError(/overload/i.test(e.message) ? "Ordis is being consulted by too many Tenno at once. Try again in a moment." : "Build generation failed: " + e.message);
     } finally { setLoading(false); }
   }, [addToHistory]);
 
