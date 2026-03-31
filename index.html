@@ -944,8 +944,7 @@ function getHelminthContext(abilityName, replaceSlot) {
   lines.push('Effect: ' + ab.desc);
   if (ab.synergy) lines.push('Build synergy: ' + ab.synergy);
   if (replaceSlot) lines.push('Replaces: Ability ' + replaceSlot);
-  return lines.join('
-');
+  return lines.join('\n');
 }
 const WFCD_TYPE_MAP = {
   "WARFRAME": "warframe", "AURA": "warframe", "EXILUS ADAPTER": "warframe", "EXILUS": "warframe",
