@@ -3320,7 +3320,7 @@ WEAPON NAMING: For beasts, always use the breed-specific name (Huras Claws, Panz
   const MISSION_PROMPT = `You are an expert Warframe mission loadout advisor with the complete WFCD mod database. ${missRef} ${SHARD_REF}
 PRIMARY=rifles/shotguns/bows/launchers. SECONDARY=pistols/thrown. MELEE=swords/hammers/scythes/staves only.
 Return ONLY valid JSON:
-{"mission_type":"type","faction":"faction","difficulty":"Easy/Medium/Hard/Extreme","sp_ready":true,"frame":"Name","role":"role","mods":[{"slot":"Aura","name":"ModName","reason":"short"},{"slot":"Exilus","name":"ModName","reason":"short"},{"slot":"1","name":"ModName","reason":"short"},{"slot":"2","name":"ModName","reason":"short"},{"slot":"3","name":"ModName","reason":"short"},{"slot":"4","name":"ModName","reason":"short"},{"slot":"5","name":"ModName","reason":"short"},{"slot":"6","name":"ModName","reason":"short"},{"slot":"7","name":"ModName","reason":"short"},{"slot":"8","name":"ModName","reason":"short"}],"arcanes":[{"name":"ArcaneName","rank":"R5","reason":"short"},{"name":"ArcaneName","rank":"R5","reason":"short"}],"archon_shards":[{"color":"Crimson/Azure/Amber/Violet/Topaz/Emerald","bonus":"exact canonical bonus"}],"helminth":{"ability":"AbilityName","replaces":"SlotName","reason":"short"},"forma":3,"primary_weapon":{"name":"Name","type":"PRIMARY","reason":"short","build_focus":"e.g. Viral/Slash","key_mods":["mod1","mod2","mod3"]},"secondary_weapon":{"name":"Name","type":"SECONDARY","reason":"short","build_focus":"e.g. Corrosive","key_mods":["mod1","mod2","mod3"]},"melee_weapon":{"name":"Name","type":"MELEE","reason":"short","build_focus":"e.g. Blood Rush/CO","key_mods":["mod1","mod2","mod3"]},"companion":{"name":"Name","type":"type","reason":"short","build_focus":"e.g. Crit","key_mods":["mod1","mod2"]},"alt_frames":[{"name":"Name","role":"role"}],"key_tactics":["t1","t2","t3"],"avoid":["a1","a2"],"playstyle":"2 sentences","strengths":["s1","s2","s3"],"weaknesses":["w1","w2"]}`;
+{"mission_type":"type","faction":"faction","difficulty":"Easy/Medium/Hard/Extreme","sp_ready":true,"frame":"Name","role":"role","mods":[{"slot":"Aura","name":"ModName","reason":"short"},{"slot":"Exilus","name":"ModName","reason":"short"},{"slot":"1","name":"ModName","reason":"short"},{"slot":"2","name":"ModName","reason":"short"},{"slot":"3","name":"ModName","reason":"short"},{"slot":"4","name":"ModName","reason":"short"},{"slot":"5","name":"ModName","reason":"short"},{"slot":"6","name":"ModName","reason":"short"},{"slot":"7","name":"ModName","reason":"short"},{"slot":"8","name":"ModName","reason":"short"}],"arcanes":[{"name":"ArcaneName","rank":"R5","reason":"short"},{"name":"ArcaneName","rank":"R5","reason":"short"}],"archon_shards":[{"color":"Crimson/Azure/Amber/Violet/Topaz/Emerald","bonus":"exact canonical bonus"}],"helminth":{"ability":"AbilityName","replaces":"SlotName","reason":"short"},"forma":3,"primary_weapon":{"name":"Name","type":"PRIMARY","reason":"short","build_focus":"e.g. Viral/Slash","key_mods":["mod1","mod2","mod3","mod4"]},"secondary_weapon":{"name":"Name","type":"SECONDARY","reason":"short","build_focus":"e.g. Corrosive","key_mods":["mod1","mod2","mod3","mod4"]},"melee_weapon":{"name":"Name","type":"MELEE","reason":"short","build_focus":"e.g. Blood Rush/CO","key_mods":["mod1","mod2","mod3","mod4"]},"companion":{"name":"Name","type":"type","reason":"short","build_focus":"e.g. Crit","key_mods":["mod1","mod2","mod3"]},"alt_frames":[{"name":"Name","role":"role"}],"key_tactics":["t1","t2","t3"],"avoid":["a1","a2"],"playstyle":"2 sentences","strengths":["s1","s2","s3"],"weaknesses":["w1","w2"]}`;
 
   // EVAL_PROMPT is built dynamically per-call based on evalType to avoid injecting all mod categories
   // See buildEvalPrompt() below which is called at generate time with the known evalType
@@ -4225,7 +4225,7 @@ function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements
       )
 
       /* Weapons panel */
-      , React.createElement('div', { className: "wf-mission-weapons", style: { display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(120px, 1fr))", gap:10, marginBottom:16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2020}}
+      , React.createElement('div', { className: "wf-mission-weapons", style: { display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:10, marginBottom:16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2020}}
         , [
           {label:"PRIMARY", data:r.primary_weapon, color:"#4a9eff", icon:"🔫", onJump:function(d){ onWeaponJump(d.name, r.frame); }},
           {label:"SECONDARY", data:r.secondary_weapon, color:"#ffaa44", icon:"🔧", onJump:function(d){ onWeaponJump(d.name, r.frame); }},
@@ -4241,7 +4241,7 @@ function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements
             , React.createElement('div', { style: {fontSize:13,fontWeight:700,color,marginBottom:4}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2032}}, _optionalChain([data, 'optionalAccess', _8 => _8.name]) || "—")
             , _optionalChain([data, 'optionalAccess', _9 => _9.reason]) && React.createElement('div', { style: {fontSize:10,color:"#3a6a8a",lineHeight:1.4}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2033}}, data.reason)
             , data && data.build_focus && React.createElement('div', { style: {fontSize:10,color:"#00d4aa99",marginTop:4,letterSpacing:"0.05em"} }, data.build_focus)
-            , data && data.key_mods && data.key_mods.length > 0 && React.createElement('div', { style: {display:"flex",flexWrap:"wrap",gap:3,marginTop:4} }, data.key_mods.slice(0,3).map(function(m,mi) { return React.createElement('span', {key:mi, style:{fontSize:8, color:color+"88", background:color+"11", border:"1px solid "+color+"22", borderRadius:2, padding:"1px 5px"}}, m); }))
+            , data && data.key_mods && data.key_mods.length > 0 && React.createElement('div', { style: {display:"flex",flexWrap:"wrap",gap:3,marginTop:4} }, data.key_mods.map(function(m,mi) { return React.createElement('span', {key:mi, style:{fontSize:8, color:color+"88", background:color+"11", border:"1px solid "+color+"22", borderRadius:2, padding:"1px 5px"}}, m); }))
             , React.createElement('div', { style: {fontSize:9,color:`${color}66`,marginTop:6,letterSpacing:"0.1em"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2034}}, "CLICK TO BUILD →"   )
           )
         ))
@@ -4261,6 +4261,20 @@ function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements
             , (r.mods || []).filter(function(m) { return m.slot !== "Exilus"; }).map(function(m) {
                 return React.createElement(ModCard, { key: m.slot+"-"+m.name, mod: m, missingMods: missingMods, onToggleMissing: onToggleMissing, replacement: replacements[m.name], knownMods: knownMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2043}});
               })
+          )
+        )
+      )
+
+      /* Helminth */
+      , r.helminth && r.helminth.ability && (
+        React.createElement('div', { style: { background: "#0a1628", border: "1px solid #aa44ff44", borderRadius: 0, padding: "14px 20px", marginBottom: 16 } }
+          , React.createElement('div', { style: { fontSize: 10, color: "#aa44ff", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8, fontFamily:"'Electrolize',monospace" } }, "⬡ Helminth")
+          , React.createElement('div', { style: { display: "flex", gap: 12, alignItems: "flex-start", flexWrap: "wrap" } }
+            , React.createElement('div', { style: { flex: 1, minWidth: 140 } }
+              , React.createElement('div', { style: { fontSize: 13, fontWeight: 700, color: "#aa44ff" } }, r.helminth.ability)
+              , r.helminth.replaces && React.createElement('div', { style: { fontSize: 10, color: "#6a4a8a", marginTop: 2 } }, "Replaces: ", React.createElement('span', { style: { color: "#8a6ab0" } }, r.helminth.replaces))
+            )
+            , r.helminth.reason && React.createElement('div', { style: { fontSize: 11, color: "#8a7aaa", lineHeight: 1.4, flex: 2, minWidth: 160 } }, r.helminth.reason)
           )
         )
       )
