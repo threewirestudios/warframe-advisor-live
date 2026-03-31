@@ -934,7 +934,7 @@ const HELMINTH_ABILITIES = [
   { name:"Subsumed Gloom",     frame:null,               type:"cc_sustain",   helminthOnly:true,  desc:"Helminth variant of Gloom. Lifesteal aura -- slows enemies, heals on hit.",                                                  synergy:"See Gloom. Top-tier sustain + slow on any frame." },
 ];
 
-function getHelminthContext(abilityName) {
+function getHelminthContext(abilityName, replaceSlot) {
   if (!abilityName) return '';
   var ab = HELMINTH_ABILITIES.find(function(a){ return a.name === abilityName; });
   if (!ab) return '';
@@ -943,7 +943,9 @@ function getHelminthContext(abilityName) {
   lines.push('Type: ' + ab.type);
   lines.push('Effect: ' + ab.desc);
   if (ab.synergy) lines.push('Build synergy: ' + ab.synergy);
-  return lines.join('\n');
+  if (replaceSlot) lines.push('Replaces: Ability ' + replaceSlot);
+  return lines.join('
+');
 }
 const WFCD_TYPE_MAP = {
   "WARFRAME": "warframe", "AURA": "warframe", "EXILUS ADAPTER": "warframe", "EXILUS": "warframe",
@@ -1835,7 +1837,7 @@ function GlowBadge({ children, color = "#00d4aa" }) {
 
 function StepCard({ title, children }) {
   return (
-    React.createElement('div', { style: {
+    React.createElement('div', { className: "wf-step-card", style: {
       background: "linear-gradient(135deg,#080f1c 0%,#060d18 100%)",
       border: "1px solid #1a3050", borderRadius: 0,
       clipPath: "polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px))",
@@ -3319,7 +3321,7 @@ WEAPON NAMING: For beasts, always use the breed-specific name (Huras Claws, Panz
   const MISSION_PROMPT = `You are an expert Warframe mission loadout advisor with the complete WFCD mod database. ${missRef} ${SHARD_REF}
 PRIMARY=rifles/shotguns/bows/launchers. SECONDARY=pistols/thrown. MELEE=swords/hammers/scythes/staves only.
 Return ONLY valid JSON:
-{"mission_type":"type","faction":"faction","difficulty":"Easy/Medium/Hard/Extreme","sp_ready":true,"frame":"Name","role":"role","mods":[{"slot":"Aura","name":"ModName","reason":"short"},{"slot":"Exilus","name":"ModName","reason":"short"},{"slot":"1","name":"ModName","reason":"short"},{"slot":"2","name":"ModName","reason":"short"},{"slot":"3","name":"ModName","reason":"short"},{"slot":"4","name":"ModName","reason":"short"},{"slot":"5","name":"ModName","reason":"short"},{"slot":"6","name":"ModName","reason":"short"},{"slot":"7","name":"ModName","reason":"short"},{"slot":"8","name":"ModName","reason":"short"}],"arcanes":[{"name":"ArcaneName","rank":"R5","reason":"short"},{"name":"ArcaneName","rank":"R5","reason":"short"}],"archon_shards":[{"color":"Crimson/Azure/Amber/Violet/Topaz/Emerald","bonus":"exact canonical bonus"}],"helminth":{"ability":"AbilityName","replaces":"SlotName","reason":"short"},"forma":3,"primary_weapon":{"name":"Name","type":"PRIMARY","reason":"short"},"secondary_weapon":{"name":"Name","type":"SECONDARY","reason":"short"},"melee_weapon":{"name":"Name","type":"MELEE","reason":"short"},"companion":{"name":"Name","type":"type","reason":"short"},"alt_frames":[{"name":"Name","role":"role"}],"key_tactics":["t1","t2","t3"],"avoid":["a1","a2"],"playstyle":"2 sentences","strengths":["s1","s2","s3"],"weaknesses":["w1","w2"]}`;
+{"mission_type":"type","faction":"faction","difficulty":"Easy/Medium/Hard/Extreme","sp_ready":true,"frame":"Name","role":"role","mods":[{"slot":"Aura","name":"ModName","reason":"short"},{"slot":"Exilus","name":"ModName","reason":"short"},{"slot":"1","name":"ModName","reason":"short"},{"slot":"2","name":"ModName","reason":"short"},{"slot":"3","name":"ModName","reason":"short"},{"slot":"4","name":"ModName","reason":"short"},{"slot":"5","name":"ModName","reason":"short"},{"slot":"6","name":"ModName","reason":"short"},{"slot":"7","name":"ModName","reason":"short"},{"slot":"8","name":"ModName","reason":"short"}],"arcanes":[{"name":"ArcaneName","rank":"R5","reason":"short"},{"name":"ArcaneName","rank":"R5","reason":"short"}],"archon_shards":[{"color":"Crimson/Azure/Amber/Violet/Topaz/Emerald","bonus":"exact canonical bonus"}],"helminth":{"ability":"AbilityName","replaces":"SlotName","reason":"short"},"forma":3,"primary_weapon":{"name":"Name","type":"PRIMARY","reason":"short","build_focus":"e.g. Viral/Slash","key_mods":["mod1","mod2","mod3"]},"secondary_weapon":{"name":"Name","type":"SECONDARY","reason":"short","build_focus":"e.g. Corrosive","key_mods":["mod1","mod2","mod3"]},"melee_weapon":{"name":"Name","type":"MELEE","reason":"short","build_focus":"e.g. Blood Rush/CO","key_mods":["mod1","mod2","mod3"]},"companion":{"name":"Name","type":"type","reason":"short","build_focus":"e.g. Crit","key_mods":["mod1","mod2"]},"alt_frames":[{"name":"Name","role":"role"}],"key_tactics":["t1","t2","t3"],"avoid":["a1","a2"],"playstyle":"2 sentences","strengths":["s1","s2","s3"],"weaknesses":["w1","w2"]}`;
 
   // EVAL_PROMPT is built dynamically per-call based on evalType to avoid injecting all mod categories
   // See buildEvalPrompt() below which is called at generate time with the known evalType
@@ -4222,7 +4224,7 @@ function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements
       )
 
       /* Weapons panel */
-      , React.createElement('div', { style: { display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2020}}
+      , React.createElement('div', { className: "wf-mission-weapons", style: { display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2020}}
         , [
           {label:"PRIMARY", data:r.primary_weapon, color:"#4a9eff", icon:"🔫"},
           {label:"SECONDARY", data:r.secondary_weapon, color:"#ffaa44", icon:"🔧"},
@@ -4236,6 +4238,8 @@ function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements
             , React.createElement('div', { style: {fontSize:10,color:"#4a7898",letterSpacing:"0.15em",marginBottom:4,fontFamily:"'Electrolize',monospace"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2031}}, icon, " " , label)
             , React.createElement('div', { style: {fontSize:13,fontWeight:700,color,marginBottom:4}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2032}}, _optionalChain([data, 'optionalAccess', _8 => _8.name]) || "—")
             , _optionalChain([data, 'optionalAccess', _9 => _9.reason]) && React.createElement('div', { style: {fontSize:10,color:"#3a6a8a",lineHeight:1.4}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2033}}, data.reason)
+            , data && data.build_focus && React.createElement('div', { style: {fontSize:10,color:"#00d4aa99",marginTop:4,letterSpacing:"0.05em"} }, data.build_focus)
+            , data && data.key_mods && data.key_mods.length > 0 && React.createElement('div', { style: {display:"flex",flexWrap:"wrap",gap:3,marginTop:4} }, data.key_mods.slice(0,3).map(function(m,mi) { return React.createElement('span', {key:mi, style:{fontSize:8, color:color+"88", background:color+"11", border:"1px solid "+color+"22", borderRadius:2, padding:"1px 5px"}}, m); }))
             , React.createElement('div', { style: {fontSize:9,color:`${color}66`,marginTop:6,letterSpacing:"0.1em"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2034}}, "CLICK TO BUILD →"   )
           )
         ))
@@ -6032,6 +6036,7 @@ function WarframeAdvisor() {
   const [frameSearch, setFrameSearch] = useState("");
   const [hoveredStyle, setHoveredStyle] = useState(null);
   const [helminthSearch, setHelminthSearch] = useState("");
+  const [helminthReplaceSlot, setHelminthReplaceSlot] = useState("");
   const [missionType, setMissionType] = useState("");
   const [faction, setFaction] = useState("");
   const [priorities, setPriorities] = useState([]);
@@ -6055,6 +6060,7 @@ function WarframeAdvisor() {
   const [evalSlots, setEvalSlots] = useState({ aura:"", exilus:"", mod1:"", mod2:"", mod3:"", mod4:"", mod5:"", mod6:"", mod7:"", mod8:"", arcane1:"", arcane2:"", shard1color:"", shard1bonus:"", shard1tau:false, shard2color:"", shard2bonus:"", shard2tau:false, shard3color:"", shard3bonus:"", shard3tau:false, shard4color:"", shard4bonus:"", shard4tau:false, shard5color:"", shard5bonus:"", shard5tau:false, helminthAbility:"", helminthReplaces:"", duration:"", efficiency:"", range:"", strength:"", incarnonEvos:"", incarnonEvoChoices:{}, isIncarnon:false, isZariman:false, weaponExilus:"", stance:"", mod9:"", mod10:"" });
   const [saveNameInput, setSaveNameInput] = useState("");
   const [screenshotKey, setScreenshotKey] = useState(0);
+  const [quickBuildMode, setQuickBuildMode] = useState(false);
 
   const [missingMods, setMissingMods] = useState([]);
   const [missingArcanes, setMissingArcanes] = useState([]);
@@ -6265,16 +6271,20 @@ function WarframeAdvisor() {
   }, []);
 
   const resetFlow = useCallback(() => {
-    setStep(0); setResult(null); setError(null);
+    setStep(0); setResult(null); setError(null); setQuickBuildMode(false);
     setFrameSearch(""); setMissionType(""); setFaction(""); setPriorities([]);
     setNotes(""); setWeaponSearch(""); setDamagePreference(""); setWeaponFrame("");
     setRivenStats(""); setRivenEvalWeapon(""); setRivenEvalStats([{sign:"+",name:"",value:"",mode:"pct"},{sign:"+",name:"",value:"",mode:"pct"},{sign:"+",name:"",value:"",mode:"pct"},{sign:"+",name:"",value:"",mode:"pct"}]); setWeaponHasRiven(false); setWeaponRivenRows([{sign:"+",name:"",value:"",mode:"pct"},{sign:"+",name:"",value:"",mode:"pct"},{sign:"+",name:"",value:"",mode:"pct"},{sign:"+",name:"",value:"",mode:"pct"}]); setCompType(""); setCompRole(""); setLockedMods([]);
     setReplacements({}); setSaveNameInput("");
+    setHelminthSearch(""); setHelminthReplaceSlot("");
     setEvalType("");
     setEvalSlots({ aura:"", exilus:"", mod1:"", mod2:"", mod3:"", mod4:"", mod5:"", mod6:"", mod7:"", mod8:"", arcane1:"", arcane2:"", shard1color:"", shard1bonus:"", shard1tau:false, shard2color:"", shard2bonus:"", shard2tau:false, shard3color:"", shard3bonus:"", shard3tau:false, shard4color:"", shard4bonus:"", shard4tau:false, shard5color:"", shard5bonus:"", shard5tau:false, helminthAbility:"", helminthReplaces:"", duration:"", efficiency:"", range:"", strength:"", incarnonEvos:"", isIncarnon:false, isZariman:false, weaponExilus:"", stance:"", mod9:"", mod10:"" });
   }, []);
 
   const goHome = useCallback(() => { resetFlow(); setScreen("home"); setScreenshotKey(k => k + 1); }, [resetFlow]);
+  const startQuickBuild = useCallback(function(flowKey) {
+    resetFlow(); setMissionType("Steel Path General"); setFaction("Grineer"); setPriorities(["Damage","Survivability"]); setQuickBuildMode(true); setScreen(flowKey);
+  }, [resetFlow]);
 
   const handleScreenshotPopulate = useCallback((parsed) => {
     if (parsed.frameName)  setFrameSearch(parsed.frameName);
@@ -6303,7 +6313,7 @@ function WarframeAdvisor() {
 
   // Stable generate function — uses refs to avoid stale closures without recreating
   const stateRef = useRef({});
-  stateRef.current = { frameSearch, missionType, faction, priorities, notes, lockedMods, missingMods, missingArcanes, weaponType, weaponSearch, damagePreference, weaponFrame, rivenStats, rivenEvalWeapon, rivenEvalStats, compType, compRole, evalText, evalSlots, evalType, wfcdMods, wfcdArcanes, advisorNotes, customMods, buildStyle, helminthSearch, innateElement, innateBonus, weaponHasRiven, weaponRivenRows };
+  stateRef.current = { frameSearch, missionType, faction, priorities, notes, lockedMods, missingMods, missingArcanes, weaponType, weaponSearch, damagePreference, weaponFrame, rivenStats, rivenEvalWeapon, rivenEvalStats, compType, compRole, evalText, evalSlots, evalType, wfcdMods, wfcdArcanes, advisorNotes, customMods, buildStyle, helminthSearch, helminthReplaceSlot, innateElement, innateBonus, weaponHasRiven, weaponRivenRows };
 
   const generate = useCallback(async (type) => {
     const s = stateRef.current;
@@ -6316,7 +6326,7 @@ function WarframeAdvisor() {
     setLoading(true); setError(null); setResult(null);
     try {
       let systemPrompt = FRAME_PROMPT, prompt = "";
-      const helmCtx = getHelminthContext(s.helminthSearch);
+      const helmCtx = getHelminthContext(s.helminthSearch, s.helminthReplaceSlot);
       const frameKitCtx = getFrameKitContext(s.frameSearch);
       if (type === "frame") {
         const missionCtx = getMissionContext(s.missionType || "Steel Path General");
@@ -6377,7 +6387,7 @@ Context: ${s.notes || "general Steel Path"}`;
       } else if (type === "mission") {
         systemPrompt = MISSION_PROMPT;
         const missionSpCtx = (s.missionType || "").includes("Steel Path") ? getSPContext() : "";
-        prompt = `Build a mission loadout.\nMission: ${s.missionType}\nFaction: ${s.faction || "any"}\nPriorities: ${s.priorities.join(", ") || "efficient clear"}\nNotes: ${s.notes || "none"}${missionSpCtx ? "\n\n" + missionSpCtx : ""}\n\n${styleCtx}${helmCtx ? "\n\n" + helmCtx : ""}`;
+        prompt = `Build a mission loadout.\nMission: ${s.missionType}\nFaction: ${s.faction || "any"}\nPriorities: ${s.priorities.join(", ") || "efficient clear"}\nFor each weapon and companion, include build_focus (1-line direction e.g. Viral/Slash) and key_mods (3-4 essential mods).\nNotes: ${s.notes || "none"}${missionSpCtx ? "\n\n" + missionSpCtx : ""}\n\n${styleCtx}${helmCtx ? "\n\n" + helmCtx : ""}`;
       } else if (type === "evaluate") {
         systemPrompt = EVAL_PROMPT;
         const es = s.evalSlots;
@@ -6620,6 +6630,12 @@ ${styleCtx}`;
           .wf-builds-label { display: none; }
           .wf-db-badge { display: none; }
           .wf-home-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .wf-step-card { padding: 16px 14px !important; }
+          .wf-mission-weapons { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 380px) {
+          .wf-home-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+          .wf-step-card { padding: 12px 10px !important; }
         }
         textarea, input { box-sizing: border-box; max-width: 100%; }
         @media (max-width: 479px) {
@@ -6779,6 +6795,13 @@ ${styleCtx}`;
                 )
               ))
             )
+            , React.createElement('div', { style: { display: "flex", justifyContent: "center", alignItems: "center", gap: 10, marginTop: 14, flexWrap: "wrap" } }
+              , React.createElement('div', { style: { fontSize: 10, color: "#3a5a7a", letterSpacing: "0.12em", fontFamily: "'Electrolize',monospace", paddingTop: 2 } }, "\u26a1 QUICK BUILD:")
+              , ["frame","weapon","companion"].map(function(key) {
+                  var labels = {frame:"Warframe",weapon:"Weapon",companion:"Companion"};
+                  return React.createElement('button', { key: key, onClick: function() { startQuickBuild(key); }, style: { background: "#060e1a", border: "1px solid #00d4aa33", borderRadius: 3, color: "#00d4aa88", fontSize: 10, padding: "4px 10px", cursor: "pointer", fontFamily: "'Electrolize',monospace", letterSpacing: "0.08em" } }, labels[key]);
+                })
+            )
           )
         )
 
@@ -6810,7 +6833,18 @@ ${styleCtx}`;
 
         , screen === "frame" && step < 99 && !loading && (
           React.createElement('div', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 3788}}
-            , step === 0 && (
+            
+            , quickBuildMode && step === 0 && (
+              React.createElement(StepCard, { title: "\u26a1 Quick Build \u2014 Warframe" }
+                , React.createElement('div', { style: { marginBottom: 16 } }
+                  , React.createElement('div', { style: { fontSize: 11, color: "#6a9fc8", marginBottom: 6 } }, "Frame (leave blank for best pick)")
+                  , React.createElement(NameAutocomplete, { list: wfcdFrames, value: frameSearch, onChange: setFrameSearch, placeholder: "e.g. Nekros, Saryn, Kullervo..." })
+                )
+                , React.createElement('div', { style: { fontSize: 10, color: "#3a5a7a", marginTop: 4, fontFamily: "'Electrolize',monospace" } }, "Defaults: SP General \u00b7 Grineer \u00b7 Damage + Survivability")
+                , React.createElement(NavFooter, { onBack: goHome, onGenerate: function() { generate("frame"); }, nextDisabled: loading })
+              )
+            )
+            , !quickBuildMode && step === 0 && (
               React.createElement(StepCard, { title: "Step 1 — Warframe & Mission"     , __self: this, __source: {fileName: _jsxFileName, lineNumber: 3790}}
                 , React.createElement('div', { style: { marginBottom: 16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 3791}}
                   , React.createElement('div', { style: { fontSize: 11, color: "#6a9fc8", marginBottom: 6 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 3792}}, "Frame (leave blank for recommendation)"    )
@@ -6836,15 +6870,24 @@ ${styleCtx}`;
                 , React.createElement(NavFooter, { onBack: () => setStep(0), onNext: () => setStep(2), __self: this, __source: {fileName: _jsxFileName, lineNumber: 3812}} )
               )
             )
-            , step === 2 && (
-              React.createElement(StepCard, { title: `Step ${["Eidolon Hunt","The Index"].includes(missionType) ? 2 : 3} — Notes`, __self: this, __source: {fileName: _jsxFileName, lineNumber: 3816}}
-                , React.createElement('div', { style: { marginBottom: 12 } }
-  , React.createElement('div', { style: { fontSize: 11, color: '#4a7fa5', marginBottom: 8 } }, 'Helminth / Subsumed Ability')
-  , React.createElement(HelminthPicker, { value: helminthSearch, onChange: setHelminthSearch })
-)
-, React.createElement('textarea', { value: notes, onChange: e => setNotes(e.target.value), placeholder: "Any special requirements? e.g. 'SP loot Nekros', 'max range', 'tank build for solo'..."            ,
-                  style: { width: "100%", background: "#060e1a", border: "1px solid #1a3050", borderRadius: 10, color: "#c8e0f0", padding: "12px", fontSize: 13, outline: "none", minHeight: 80, resize: "vertical" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 3817}} )
-                , React.createElement(NavFooter, { onBack: () => setStep(["Eidolon Hunt","The Index"].includes(missionType) ? 0 : 1), onGenerate: () => generate("frame"), nextDisabled: loading, __self: this, __source: {fileName: _jsxFileName, lineNumber: 3819}} )
+                        , step === 2 && (
+              React.createElement(StepCard, { title: ["Eidolon Hunt","The Index"].includes(missionType) ? "Step 2 \u2014 Helminth" : "Step 3 \u2014 Helminth" }
+                , React.createElement('div', { style: { marginBottom: 8 } }
+                  , React.createElement('div', { style: { fontSize: 11, color: "#aa44ff", marginBottom: 8 } }, "Subsumed Ability (optional)")
+                  , React.createElement(HelminthPicker, { value: helminthSearch, onChange: function(v) { setHelminthSearch(v); if (!v) setHelminthReplaceSlot(""); } })
+                )
+                , helminthSearch && React.createElement('div', { style: { marginTop: 12 } }
+                  , React.createElement('div', { style: { fontSize: 11, color: "#6a9fc8", marginBottom: 8 } }, "Replace which ability?")
+                  , React.createElement(OptionGrid, { options: [{v:"1"},{v:"2"},{v:"3"},{v:"4"}], selected: helminthReplaceSlot, onSelect: setHelminthReplaceSlot, columns: 4 })
+                )
+                , React.createElement(NavFooter, { onBack: function() { setStep(["Eidolon Hunt","The Index"].includes(missionType) ? 0 : 1); }, onNext: function() { setStep(3); } })
+              )
+            )
+            , step === 3 && (
+              React.createElement(StepCard, { title: ["Eidolon Hunt","The Index"].includes(missionType) ? "Step 3 \u2014 Notes" : "Step 4 \u2014 Notes" }
+                , React.createElement('textarea', { value: notes, onChange: function(e) { setNotes(e.target.value); }, placeholder: "Any special requirements? e.g. SP loot Nekros, max range, tank build for solo...",
+                  style: { width: "100%", background: "#060e1a", border: "1px solid #1a3050", borderRadius: 10, color: "#c8e0f0", padding: "12px", fontSize: 13, outline: "none", minHeight: 80, resize: "vertical" } })
+                , React.createElement(NavFooter, { onBack: function() { setStep(2); }, onGenerate: function() { generate("frame"); }, nextDisabled: loading })
               )
             )
           )
@@ -6852,7 +6895,22 @@ ${styleCtx}`;
 
         , screen === "weapon" && step < 99 && !loading && (
           React.createElement('div', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 3826}}
-            , step === 0 && (
+            
+            , quickBuildMode && step === 0 && (
+              React.createElement(StepCard, { title: "\u26a1 Quick Build \u2014 Weapon" }
+                , React.createElement('div', { style: { marginBottom: 12 } }
+                  , React.createElement('div', { style: { fontSize: 11, color: "#6a9fc8", marginBottom: 8 } }, "Type")
+                  , React.createElement(OptionGrid, { options: WEAPON_TYPES.filter(function(t) { return t.v !== "Exalted"; }), selected: weaponType, onSelect: setWeaponType, columns: 2 })
+                )
+                , React.createElement('div', { style: { marginBottom: 8 } }
+                  , React.createElement('div', { style: { fontSize: 11, color: "#6a9fc8", marginBottom: 6 } }, "Weapon (leave blank for recommendation)")
+                  , React.createElement(NameAutocomplete, { list: wfcdWeapons, value: weaponSearch, onChange: setWeaponSearch, placeholder: "e.g. Kuva Nukor, Felarx, Hate..." })
+                )
+                , React.createElement('div', { style: { fontSize: 10, color: "#3a5a7a", marginTop: 4, fontFamily: "'Electrolize',monospace" } }, "Defaults: SP General \u00b7 Grineer \u00b7 Damage + Survivability")
+                , React.createElement(NavFooter, { onBack: goHome, onGenerate: function() { generate("weapon"); }, nextDisabled: loading || !weaponType })
+              )
+            )
+            , !quickBuildMode && step === 0 && (
               React.createElement(StepCard, { title: "Step 1 — Weapon"   , __self: this, __source: {fileName: _jsxFileName, lineNumber: 3828}}
                 , React.createElement('div', { style: { marginBottom: 16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 3829}}
                   , React.createElement('div', { style: { fontSize: 11, color: "#6a9fc8", marginBottom: 8 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 3830}}, "Type")
@@ -7013,7 +7071,15 @@ ${styleCtx}`;
 
         , screen === "companion" && step < 99 && !loading && (
           React.createElement('div', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 3890}}
-            , step === 0 && (
+            
+            , quickBuildMode && step === 0 && (
+              React.createElement(StepCard, { title: "\u26a1 Quick Build \u2014 Companion" }
+                , React.createElement(OptionGrid, { options: COMP_TYPES, selected: compType, onSelect: setCompType })
+                , React.createElement('div', { style: { fontSize: 10, color: "#3a5a7a", marginTop: 8, fontFamily: "'Electrolize',monospace" } }, "Defaults: SP General \u00b7 Grineer \u00b7 Survivability")
+                , React.createElement(NavFooter, { onBack: goHome, onGenerate: function() { generate("companion"); }, nextDisabled: loading || !compType })
+              )
+            )
+            , !quickBuildMode && step === 0 && (
               React.createElement(StepCard, { title: "Step 1 — Companion Type"    , __self: this, __source: {fileName: _jsxFileName, lineNumber: 3892}}
                 , React.createElement(OptionGrid, { options: COMP_TYPES, selected: compType, onSelect: setCompType, __self: this, __source: {fileName: _jsxFileName, lineNumber: 3893}} )
                 , React.createElement(NavFooter, { onBack: goHome, onNext: () => setStep(1), nextDisabled: !compType, __self: this, __source: {fileName: _jsxFileName, lineNumber: 3894}} )
