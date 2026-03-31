@@ -4241,7 +4241,25 @@ function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements
         ))
       )
 
-      /* Full frame build — reuse same sections as FrameResult */
+      /* Frame mod loadout */
+      , r.mods && r.mods.length > 0 && (
+        React.createElement('div', { style: { background: "#0a1628", border: "1px solid #1a3050", borderRadius: 0, padding: "16px 20px", marginBottom: 16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2040}}
+          , React.createElement('div', { style: { fontSize: 10, color: "#6a9fc8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10, fontFamily:"'Electrolize',monospace" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2040}}, "Frame Mod Loadout")
+          , (r.mods || []).filter(function(m) { return m.slot === "Exilus"; }).map(function(m, i) {
+              return React.createElement('div', { key: "exilus"+i, style: { marginBottom: 10 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2041}}
+                , React.createElement('div', { style: { fontSize: 9, color: "#00d4aa88", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 3 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2041}}, "Exilus")
+                , React.createElement(ModCard, { mod: m, missingMods: missingMods, onToggleMissing: onToggleMissing, replacement: replacements[m.name], knownMods: knownMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2041}})
+              );
+            })
+          , React.createElement('div', { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 8 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2042}}
+            , (r.mods || []).filter(function(m) { return m.slot !== "Exilus"; }).map(function(m) {
+                return React.createElement(ModCard, { key: m.slot+"-"+m.name, mod: m, missingMods: missingMods, onToggleMissing: onToggleMissing, replacement: replacements[m.name], knownMods: knownMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2043}});
+              })
+          )
+        )
+      )
+
+      /* Arcanes */
       , r.arcanes && (
         React.createElement('div', { style: { background: "#0a1628", border: "1px solid #1a3050", borderRadius: 0, padding: "16px 20px", marginBottom: 16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2041}}
           , React.createElement('div', { style: { fontSize: 10, color: "#6a9fc8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10, fontFamily:"'Electrolize',monospace" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2042}}, "Arcanes")
