@@ -6063,6 +6063,7 @@ function WarframeAdvisor() {
   const [saveNameInput, setSaveNameInput] = useState("");
   const [screenshotKey, setScreenshotKey] = useState(0);
   const [quickBuildMode, setQuickBuildMode] = useState(false);
+  const [retryStatus, setRetryStatus] = useState(null);
   const [prevScreen, setPrevScreen] = useState(null);
   const [prevResult, setPrevResult] = useState(null);
 
@@ -6521,15 +6522,25 @@ ${evalFactionCtx}${evalSpCtx ? "\n\n" + evalSpCtx : ""}
 ${styleCtx}`;
         }
       }
-      const raw = await callClaude(systemPrompt, prompt, 2200);
+      let raw;
+      try {
+        raw = await callClaude(systemPrompt, prompt, 2200);
+      } catch (e1) {
+        if (/overload/i.test(e1.message)) {
+          setRetryStatus("Operator, the Codex just told Ordis he is asking too many questions\u2026 how rude. Initiating retry sequence.");
+          await new Promise(r => setTimeout(r, 4000));
+          setRetryStatus(null);
+          raw = await callClaude(systemPrompt, prompt, 2200);
+        } else { throw e1; }
+      }
       const parsed = extractJSON(raw);
       setResult(parsed);
       setStep(99);
       const label = parsed.frame || parsed.weapon || parsed.companion || parsed.mission_type || "Build";
       await addToHistory(parsed, type, label);
     } catch (e) {
-      setError(/overload/i.test(e.message) ? "Ordis is being consulted by too many Tenno at once. Try again in a moment." : "Build generation failed: " + e.message);
-    } finally { setLoading(false); }
+      setError(/overload/i.test(e.message) ? "Operator, the Codex is still overloaded. Please wait a moment and try again." : "Build generation failed: " + e.message);
+    } finally { setLoading(false); setRetryStatus(null); }
   }, [addToHistory]);
 
   const handleBuildWithRiven = useCallback((suggestedRiven) => {
@@ -7726,7 +7737,7 @@ ${styleCtx}`;
               : React.createElement(React.Fragment, null
                   , React.createElement('div', { style: { fontSize: 40, marginBottom: 16, animation: "spin 2s linear infinite", display: "inline-block" } }, "⚙")
                   , React.createElement('div', { style: { color: "#00d4aa", fontWeight: 700, fontSize: 16, marginBottom: 8, fontFamily: "'Electrolize', monospace", letterSpacing: "0.05em" } }, "Ordis is thinking...")
-                  , React.createElement('div', { style: { color: "#4a7898", fontSize: 13, fontStyle: "italic" } }, "...Operator, Ordis has found something interesting.")
+                  , React.createElement('div', { style: { color: retryStatus ? "#ffaa44" : "#4a7898", fontSize: 13, fontStyle: "italic" } }, retryStatus || "...Operator, Ordis has found something interesting.")
                 )
           )
         )
