@@ -4202,7 +4202,7 @@ function CompanionResult({ r, missingMods, knownMods, replacements, onToggleMiss
     )
   );
 }
-function MissionResult({ r, missingMods, missingArcanes, replacements, lockedMods, onToggleMissing, onToggleLock, onGenerate, onWeaponJump, onCompanionJump, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods }) {
+function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements, lockedMods, onToggleMissing, onToggleLock, onGenerate, onWeaponJump, onCompanionJump, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods }) {
   const [missionTauShards, setMissionTauShards] = useState({});
   const shardColors = { Crimson: "#ff5555", Azure: "#4a9eff", Amber: "#ffaa00", Violet: "#aa44ff", Topaz: "#ffdd44", Emerald: "#44dd88" };
   const allMissing = [...missingMods, ...missingArcanes];
