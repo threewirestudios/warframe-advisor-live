@@ -6522,15 +6522,16 @@ ${evalFactionCtx}${evalSpCtx ? "\n\n" + evalSpCtx : ""}
 ${styleCtx}`;
         }
       }
+      const maxTok = type === "mission" ? 4000 : 2200;
       let raw;
       try {
-        raw = await callClaude(systemPrompt, prompt, 2200);
+        raw = await callClaude(systemPrompt, prompt, maxTok);
       } catch (e1) {
         if (/overload/i.test(e1.message)) {
           setRetryStatus("Operator, the Codex just told Ordis he is asking too many questions\u2026 how rude. Initiating retry sequence.");
           await new Promise(r => setTimeout(r, 4000));
           setRetryStatus(null);
-          raw = await callClaude(systemPrompt, prompt, 2200);
+          raw = await callClaude(systemPrompt, prompt, maxTok);
         } else { throw e1; }
       }
       const parsed = extractJSON(raw);
@@ -6564,7 +6565,7 @@ ${styleCtx}`;
       const fullPrompt = chatSummary
         ? `${nameLock}CONVERSATION CONTEXT LEADING TO THIS REBUILD:\n${chatSummary}\n\n---\nREBUILD REQUEST:\n${rebuildPrompt}`
         : `${nameLock}${rebuildPrompt}`;
-      const raw = await callClaude(sysMap[type] || FP, fullPrompt, 2200);
+      const raw = await callClaude(sysMap[type] || FP, fullPrompt, type === "mission" ? 4000 : 2200);
       const parsed = extractJSON(raw);
       setResult(parsed);
       await addToHistory(parsed, type, parsed.frame || parsed.weapon || "Rebuild");
