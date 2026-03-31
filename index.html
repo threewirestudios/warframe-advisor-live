@@ -3931,11 +3931,12 @@ function FrameResult({ r, missingMods, knownMods, missingArcanes, replacements, 
   );
 }
 
-function WeaponResult({ r, missingMods, knownMods, missingArcanes, replacements, onToggleMissing, onSave, saveNameInput, setSaveNameInput, onRebuild, onBuildWithRiven, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, buildStyle }) {
+function WeaponResult({ r, missingMods, knownMods, missingArcanes, replacements, onToggleMissing, onSave, saveNameInput, setSaveNameInput, onRebuild, onBuildWithRiven, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, buildStyle, onBackToPrev, prevScreen }) {
   const [tauShards, setTauShards] = useState({});
   const shardColors = { Crimson: "#ff5555", Azure: "#4a9eff", Amber: "#ffaa00", Violet: "#aa44ff", Topaz: "#ffdd44", Emerald: "#44dd88" };
   return (
     React.createElement('div', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 1809}}
+      , onBackToPrev && React.createElement('button', { onClick: onBackToPrev, style: { background: "#0a1628", border: "1px solid #1a3050", borderRadius: 0, clipPath: "polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))", color: "#6a9fc8", padding: "8px 14px", cursor: "pointer", fontSize: 11, fontFamily: "'Electrolize',monospace", letterSpacing: "0.06em", marginBottom: 12, display: "block" } }, "\u25c2 BACK TO " + (prevScreen === "mission" ? "MISSION BUILD" : prevScreen === "frame" ? "FRAME BUILD" : "PREVIOUS"))
       , React.createElement('div', { style: { display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1810}}
         , React.createElement('div', { style: { flex: 1, minWidth: 200, background: "#0a1628", border: `1px solid ${r.type === "Exalted" ? "#00d4aa44" : "#1a3050"}`, borderRadius: 12, padding: "16px 20px" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1811}}
           , r.type === "Exalted" && React.createElement('div', { style: { fontSize: 9, color: "#00d4aa", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 4 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1812}}, "✦ Exalted Weapon"  )
@@ -4138,13 +4139,14 @@ function WeaponResult({ r, missingMods, knownMods, missingArcanes, replacements,
   );
 }
 
-function CompanionResult({ r, missingMods, knownMods, replacements, onToggleMissing, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods }) {
+function CompanionResult({ r, missingMods, knownMods, replacements, onToggleMissing, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, onBackToPrev, prevScreen }) {
   const isBeast = ["Kavat","Kubrow","Vulpaphyla","Predasite"].some(t => (r.type || "").includes(t));
   const isSentinel = (r.type || "").includes("Sentinel");
   const weaponCat = _optionalChain([r, 'access', _6 => _6.companion_weapon, 'optionalAccess', _7 => _7.weapon_category]) || (isBeast ? "Beast Claws" : isSentinel ? "Sentinel Weapon" : null);
   const isBeastClaws = weaponCat === "Beast Claws";
   return (
     React.createElement('div', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 1941}}
+, onBackToPrev && React.createElement('button', { onClick: onBackToPrev, style: { background: "#0a1628", border: "1px solid #1a3050", borderRadius: 0, clipPath: "polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))", color: "#6a9fc8", padding: "8px 14px", cursor: "pointer", fontSize: 11, fontFamily: "'Electrolize',monospace", letterSpacing: "0.06em", marginBottom: 12, display: "block" } }, "\u25c2 BACK TO " + (prevScreen === "mission" ? "MISSION BUILD" : prevScreen === "frame" ? "FRAME BUILD" : "PREVIOUS"))
       , React.createElement('div', { style: { background: "#0a1628", border: "1px solid #ffaa4433", borderRadius: 12, padding: "16px 20px", marginBottom: 16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1942}}
         , React.createElement('div', { style: { fontSize: 24, fontWeight: 900, color: "#ffaa44" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1943}}, r.companion)
         , React.createElement('div', { style: { color: "#aa7a44", fontSize: 13, marginTop: 4 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1944}}, r.type, " · "  , r.role)
@@ -4223,13 +4225,14 @@ function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements
       )
 
       /* Weapons panel */
-      , React.createElement('div', { className: "wf-mission-weapons", style: { display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2020}}
+      , React.createElement('div', { className: "wf-mission-weapons", style: { display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(120px, 1fr))", gap:10, marginBottom:16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2020}}
         , [
-          {label:"PRIMARY", data:r.primary_weapon, color:"#4a9eff", icon:"🔫"},
-          {label:"SECONDARY", data:r.secondary_weapon, color:"#ffaa44", icon:"🔧"},
-          {label:"MELEE", data:r.melee_weapon, color:"#ff6644", icon:"⚔"},
-        ].map(({label,data,color,icon}) => (
-          React.createElement('button', { key: label, onClick: () => data && onWeaponJump(data.name, r.frame), style: {
+          {label:"PRIMARY", data:r.primary_weapon, color:"#4a9eff", icon:"🔫", onJump:function(d){ onWeaponJump(d.name, r.frame); }},
+          {label:"SECONDARY", data:r.secondary_weapon, color:"#ffaa44", icon:"🔧", onJump:function(d){ onWeaponJump(d.name, r.frame); }},
+          {label:"MELEE", data:r.melee_weapon, color:"#ff6644", icon:"⚔", onJump:function(d){ onWeaponJump(d.name, r.frame); }},
+          {label:"COMPANION", data:r.companion, color:"#00d4aa", icon:"🐾", onJump:function(d){ onCompanionJump(d.name); }},
+        ].map(({label,data,color,icon,onJump}) => (
+          React.createElement('button', { key: label, onClick: () => data && onJump(data), style: {
             background:"#060e1a", border:`1px solid ${color}44`, borderRadius:0,
             clipPath:"polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))",
             padding:"12px 14px", cursor:"pointer", textAlign:"left", color:"inherit",
@@ -6060,6 +6063,8 @@ function WarframeAdvisor() {
   const [saveNameInput, setSaveNameInput] = useState("");
   const [screenshotKey, setScreenshotKey] = useState(0);
   const [quickBuildMode, setQuickBuildMode] = useState(false);
+  const [prevScreen, setPrevScreen] = useState(null);
+  const [prevResult, setPrevResult] = useState(null);
 
   const [missingMods, setMissingMods] = useState([]);
   const [missingArcanes, setMissingArcanes] = useState([]);
@@ -6312,7 +6317,7 @@ function WarframeAdvisor() {
 
   // Stable generate function — uses refs to avoid stale closures without recreating
   const stateRef = useRef({});
-  stateRef.current = { frameSearch, missionType, faction, priorities, notes, lockedMods, missingMods, missingArcanes, weaponType, weaponSearch, damagePreference, weaponFrame, rivenStats, rivenEvalWeapon, rivenEvalStats, compType, compRole, evalText, evalSlots, evalType, wfcdMods, wfcdArcanes, advisorNotes, customMods, buildStyle, helminthSearch, helminthReplaceSlot, innateElement, innateBonus, weaponHasRiven, weaponRivenRows };
+  stateRef.current = { frameSearch, missionType, faction, priorities, notes, lockedMods, missingMods, missingArcanes, weaponType, weaponSearch, damagePreference, weaponFrame, rivenStats, rivenEvalWeapon, rivenEvalStats, compType, compRole, evalText, evalSlots, evalType, wfcdMods, wfcdArcanes, advisorNotes, customMods, buildStyle, helminthSearch, helminthReplaceSlot, innateElement, innateBonus, weaponHasRiven, weaponRivenRows, screen, result };
 
   const generate = useCallback(async (type) => {
     const s = stateRef.current;
@@ -6557,6 +6562,7 @@ ${styleCtx}`;
   }, [addToHistory, wfcdMods, advisorNotes, customMods, result]);
 
   const jumpToWeaponBuild = useCallback((weaponName, frameName) => {
+    setPrevScreen(stateRef.current.screen); setPrevResult(stateRef.current.result);
     setWeaponSearch(weaponName); setWeaponFrame(frameName || ""); setWeaponType("auto");
     setResult(null); setScreen("weapon"); setStep(99); setLoading(true); setError(null);
     (async () => {
@@ -6572,6 +6578,7 @@ ${styleCtx}`;
   }, [addToHistory]);
 
   const jumpToCompanionBuild = useCallback((companionName) => {
+    setPrevScreen(stateRef.current.screen); setPrevResult(stateRef.current.result);
     setCompType(companionName); setResult(null); setScreen("companion"); setStep(99); setLoading(true); setError(null);
     (async () => {
       try {
@@ -6584,6 +6591,12 @@ ${styleCtx}`;
       finally { setLoading(false); }
     })();
   }, [addToHistory]);
+  const goBackToPrev = useCallback(() => {
+    if (prevScreen && prevResult) {
+      setScreen(prevScreen); setResult(prevResult);
+      setPrevScreen(null); setPrevResult(null);
+    }
+  }, [prevScreen, prevResult]);
 
   const screenLabel = { frame: "Warframe", weapon: "Weapon", companion: "Companion", mission: "Mission", evaluate: "Evaluate", riven_compare: "Compare Rivens" };
   const evalScreenLabel = evalType ? `Evaluate · ${evalType}` : "Evaluate";
@@ -7742,11 +7755,13 @@ ${styleCtx}`;
             , screen === "weapon" && (
               React.createElement(WeaponResult, { r: result, missingMods: missingMods, knownMods: wfcdMods, missingArcanes: missingArcanes, replacements: replacements,
                 onToggleMissing: toggleMissing, onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput, onRebuild: handleRebuild, onBuildWithRiven: handleBuildWithRiven, buildStyle: buildStyle,
+                onBackToPrev: goBackToPrev, prevScreen: prevScreen,
                 advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4437}} )
             )
             , screen === "companion" && (
               React.createElement(CompanionResult, { r: result, missingMods: missingMods, knownMods: wfcdMods, replacements: replacements,
                 onToggleMissing: toggleMissing, onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput, onRebuild: handleRebuild,
+                onBackToPrev: goBackToPrev, prevScreen: prevScreen,
                 advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4442}} )
             )
             , screen === "mission" && (
