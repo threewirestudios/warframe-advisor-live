@@ -3373,7 +3373,7 @@ Rules:
 
 Return ONLY valid JSON (no markdown):
 {"weapon":"name","roll_grade":"God Roll|Great|Good|Average|Below Average|Reroll","grade_reason":"one sentence","stat_scores":[{"stat":"+X% Critical Chance","rating":"S|A|B|C|D","note":"brief reason"}],"negative_verdict":"one sentence on the negative â€” workable / leverageable / crippling. Write none if no negative.","priority_stats":["ideal stat 1","ideal stat 2","ideal stat 3"],"wasted_stats":["stat names that add little for this weapon â€” empty array if none"],"reroll_advice":"specific guidance on what to target on reroll","style_fit":"one sentence on how this roll fits the specified build style"}`;
-const CHAT_PROMPT = `You are Ordis, an expert Warframe build advisor. The user has a build and wants to discuss it.
+const CHAT_PROMPT = `You are Ordis, an expert Warframe build advisor. The user has a build and wants to discuss it. If a SAVED BUILD LIBRARY appears in the context, reference those saved builds by name when the user asks about them.
 
 CRITICAL — INCARNON EVOLUTIONS ARE NOT MODS:
 Incarnon weapons have Evolution tiers (Evo II, III, IV, V) with perk choices like "Devouring Attrition", "Absolute Valor", "Lex Talionis", "Critical Parallel", etc. These are INCARNON EVOLUTION CHOICES — they are NOT mods and are NOT in WFCD. Do NOT treat them as mods. Do NOT attempt to teach or save them as mods. Do NOT say they are "not found in WFCD". When the user asks about incarnon evolutions, answer as expert Warframe knowledge — explain which perk to choose and why based on the build context.
@@ -3441,7 +3441,7 @@ function RivenEvalResult({ r, evalBuildData, onSave, saveNameInput, setSaveNameI
     )
   );
 }
-function BuildChat({ buildContext, buildType, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods }) {
+function BuildChat({ buildContext, buildType, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, savedBuilds }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput]       = useState("");
   const [loading, setLoading]   = useState(false);
@@ -3557,7 +3557,20 @@ function BuildChat({ buildContext, buildType, onRebuild, advisorNotes, onSaveAdv
         ? `\nUSER-TAUGHT MODS:\n${Object.entries(customMods).map(([n,v]) => `- ${n}: ${v.desc}${v.player_reported ? " [player-reported]" : ""}`).join("\n")}\n` : "";
       const verifyCtx = pendingVerify
         ? `\nPENDING VERIFICATION: User was asked to confirm which description is correct for "${pendingVerify.modName}" (WFCD: "${pendingVerify.wfcdDesc}" vs claimed: "${pendingVerify.claimedDesc}").\n` : "";
-      const prompt = `BUILD CONTEXT:\n${JSON.stringify(buildContext, null, 2)}${notesCtx}${customCtx}${verifyCtx}\nCONVERSATION:\n${history}\n\nUser: ${userMsg}`;
+      const savedBuildsCtx = (function() {
+        var entries = [];
+        Object.entries(savedBuilds || {}).forEach(function(pair) {
+          var cat = pair[0]; var builds = pair[1] || [];
+          builds.forEach(function(b) {
+            var bld = b.build || {};
+            var who = bld.frame || bld.weapon || bld.companion || "";
+            var mods = (bld.mods || []).slice(0, 4).map(function(m){ return m.name || m; }).join(", ");
+            entries.push("[" + cat + "] \"" + b.name + "\"" + (who ? " -- " + who : "") + (mods ? " (" + mods + ")" : ""));
+          });
+        });
+        return entries.length ? "\nSAVED BUILD LIBRARY:\n" + entries.join("\n") + "\n" : "";
+      })();
+      const prompt = `BUILD CONTEXT:\n${JSON.stringify(buildContext, null, 2)}${notesCtx}${customCtx}${verifyCtx}${savedBuildsCtx}\nCONVERSATION:\n${history}\n\nUser: ${userMsg}`;
       const raw = await callClaude(CHAT_PROMPT, prompt, 800);
       let replied = false;
       try {
@@ -3715,7 +3728,7 @@ function BuildChat({ buildContext, buildType, onRebuild, advisorNotes, onSaveAdv
 }
 
 
-function FrameResult({ r, missingMods, knownMods, missingArcanes, replacements, lockedMods, onToggleMissing, onToggleLock, onGenerate, onWeaponJump, onCompanionJump, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods }) {
+function FrameResult({ r, missingMods, knownMods, missingArcanes, replacements, lockedMods, onToggleMissing, onToggleLock, onGenerate, onWeaponJump, onCompanionJump, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, savedBuilds }) {
   const [tauShards, setTauShards] = useState({});  // index → boolean, click to toggle tau
   const shardColors = { Crimson: "#ff5555", Azure: "#4a9eff", Amber: "#ffaa00", Violet: "#aa44ff", Topaz: "#ffdd44", Emerald: "#44dd88" };
   // parseShardBonus is the top-level function defined above SHARD_REF
@@ -3889,12 +3902,12 @@ function FrameResult({ r, missingMods, knownMods, missingArcanes, replacements, 
           color: "#00d4aa", padding: "8px 16px", cursor: "pointer", fontSize: 13, fontWeight: 700
         }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1797}}, "💾 Save" )
       )
-      , React.createElement(BuildChat, { buildContext: r, buildType: "frame", onRebuild: onRebuild, advisorNotes: advisorNotes, onSaveAdvisorNotes: onSaveAdvisorNotes, customMods: customMods, onSaveCustomMods: onSaveCustomMods, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1802}} )
+      , React.createElement(BuildChat, { buildContext: r, buildType: "frame", onRebuild: onRebuild, advisorNotes: advisorNotes, onSaveAdvisorNotes: onSaveAdvisorNotes, customMods: customMods, onSaveCustomMods: onSaveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1802}} )
     )
   );
 }
 
-function WeaponResult({ r, missingMods, knownMods, missingArcanes, replacements, onToggleMissing, onSave, saveNameInput, setSaveNameInput, onRebuild, onBuildWithRiven, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, buildStyle, onBackToPrev, prevScreen }) {
+function WeaponResult({ r, missingMods, knownMods, missingArcanes, replacements, onToggleMissing, onSave, saveNameInput, setSaveNameInput, onRebuild, onBuildWithRiven, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, buildStyle, onBackToPrev, prevScreen, savedBuilds }) {
   const [tauShards, setTauShards] = useState({});
   const shardColors = { Crimson: "#ff5555", Azure: "#4a9eff", Amber: "#ffaa00", Violet: "#aa44ff", Topaz: "#ffdd44", Emerald: "#44dd88" };
   return (
@@ -4097,12 +4110,12 @@ function WeaponResult({ r, missingMods, knownMods, missingArcanes, replacements,
           color: "#00d4aa", padding: "8px 16px", cursor: "pointer", fontSize: 13, fontWeight: 700
         }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1925}}, "💾 Save" )
       )
-      , React.createElement(BuildChat, { buildContext: r, buildType: "weapon", onRebuild: onRebuild, advisorNotes: advisorNotes, onSaveAdvisorNotes: onSaveAdvisorNotes, customMods: customMods, onSaveCustomMods: onSaveCustomMods, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1930}} )
+      , React.createElement(BuildChat, { buildContext: r, buildType: "weapon", onRebuild: onRebuild, advisorNotes: advisorNotes, onSaveAdvisorNotes: onSaveAdvisorNotes, customMods: customMods, onSaveCustomMods: onSaveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1930}} )
     )
   );
 }
 
-function CompanionResult({ r, missingMods, knownMods, replacements, onToggleMissing, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, onBackToPrev, prevScreen }) {
+function CompanionResult({ r, missingMods, knownMods, replacements, onToggleMissing, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, onBackToPrev, prevScreen, savedBuilds }) {
   const isBeast = ["Kavat","Kubrow","Vulpaphyla","Predasite"].some(t => (r.type || "").includes(t));
   const isSentinel = (r.type || "").includes("Sentinel");
   const weaponCat = _optionalChain([r, 'access', _6 => _6.companion_weapon, 'optionalAccess', _7 => _7.weapon_category]) || (isBeast ? "Beast Claws" : isSentinel ? "Sentinel Weapon" : null);
@@ -4164,11 +4177,11 @@ function CompanionResult({ r, missingMods, knownMods, replacements, onToggleMiss
           color: "#00d4aa", padding: "8px 16px", cursor: "pointer", fontSize: 13, fontWeight: 700
         }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1991}}, "💾 Save" )
       )
-      , React.createElement(BuildChat, { buildContext: r, buildType: "companion", onRebuild: onRebuild, advisorNotes: advisorNotes, onSaveAdvisorNotes: onSaveAdvisorNotes, customMods: customMods, onSaveCustomMods: onSaveCustomMods, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1996}} )
+      , React.createElement(BuildChat, { buildContext: r, buildType: "companion", onRebuild: onRebuild, advisorNotes: advisorNotes, onSaveAdvisorNotes: onSaveAdvisorNotes, customMods: customMods, onSaveCustomMods: onSaveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1996}} )
     )
   );
 }
-function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements, lockedMods, onToggleMissing, onToggleLock, onGenerate, onWeaponJump, onCompanionJump, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods }) {
+function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements, lockedMods, onToggleMissing, onToggleLock, onGenerate, onWeaponJump, onCompanionJump, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, savedBuilds }) {
   const [missionTauShards, setMissionTauShards] = useState({});
   const shardColors = { Crimson: "#ff5555", Azure: "#4a9eff", Amber: "#ffaa00", Violet: "#aa44ff", Topaz: "#ffdd44", Emerald: "#44dd88" };
   const allMissing = [...missingMods, ...missingArcanes];
@@ -4343,12 +4356,12 @@ function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements
           color: "#00d4aa", padding: "8px 16px", cursor: "pointer", fontSize: 13, fontWeight: 700
         }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2135}}, "💾 Save Build"  )
       )
-      , React.createElement(BuildChat, { buildContext: r, buildType: "frame", onRebuild: onRebuild, advisorNotes: advisorNotes, onSaveAdvisorNotes: onSaveAdvisorNotes, customMods: customMods, onSaveCustomMods: onSaveCustomMods, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2140}} )
+      , React.createElement(BuildChat, { buildContext: r, buildType: "frame", onRebuild: onRebuild, advisorNotes: advisorNotes, onSaveAdvisorNotes: onSaveAdvisorNotes, customMods: customMods, onSaveCustomMods: onSaveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2140}} )
     )
   );
 }
 
-function EvalResult({ r, onRebuild, onSave, saveNameInput, setSaveNameInput, evalBuildData, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods }) {
+function EvalResult({ r, onRebuild, onSave, saveNameInput, setSaveNameInput, evalBuildData, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, savedBuilds }) {
   if (!r) return null;
   const gradeColor = { S: "#ffd700", A: "#00d4aa", B: "#6a9fc8", C: "#ff8800", D: "#ff4444" }[r.grade] || "#6a9fc8";
   // Derive the subject name — from eval data or fallback to frame key
@@ -4444,7 +4457,7 @@ function EvalResult({ r, onRebuild, onSave, saveNameInput, setSaveNameInput, eva
           color: "#00d4aa", padding: "8px 16px", cursor: "pointer", fontSize: 13, fontWeight: 700
         }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2230}}, "💾 Save" )
       )
-      , React.createElement(BuildChat, { buildContext: r, buildType: "frame", onRebuild: onRebuild, advisorNotes: advisorNotes, onSaveAdvisorNotes: onSaveAdvisorNotes, customMods: customMods, onSaveCustomMods: onSaveCustomMods, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2235}} )
+      , React.createElement(BuildChat, { buildContext: r, buildType: "frame", onRebuild: onRebuild, advisorNotes: advisorNotes, onSaveAdvisorNotes: onSaveAdvisorNotes, customMods: customMods, onSaveCustomMods: onSaveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2235}} )
     )
   );
 }
@@ -5485,7 +5498,7 @@ function LibraryPanel({ open, onClose, libraryTab, setLibraryTab, savedBuilds, h
             )
           )
           , libraryTab === "wishlist" && (
-            React.createElement(WishlistTab, { missingMods: missingMods, missingArcanes: missingArcanes, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2661}} )
+            React.createElement(WishlistTab, { missingMods: missingMods, missingArcanes: missingArcanes, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2661}} )
           )
           , libraryTab === "memory" && (
             React.createElement('div', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 2664}}
@@ -7741,32 +7754,32 @@ ${styleCtx}`;
                 lockedMods: lockedMods, onToggleMissing: toggleMissing, onToggleLock: toggleLock,
                 onGenerate: generate, onWeaponJump: jumpToWeaponBuild, onCompanionJump: jumpToCompanionBuild,
                 onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput, onRebuild: handleRebuild,
-                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4430}} )
+                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4430}} )
             )
             , screen === "weapon" && (
               React.createElement(WeaponResult, { r: result, missingMods: missingMods, knownMods: wfcdMods, missingArcanes: missingArcanes, replacements: replacements,
                 onToggleMissing: toggleMissing, onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput, onRebuild: handleRebuild, onBuildWithRiven: handleBuildWithRiven, buildStyle: buildStyle,
                 onBackToPrev: goBackToPrev, prevScreen: prevScreen,
-                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4437}} )
+                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4437}} )
             )
             , screen === "companion" && (
               React.createElement(CompanionResult, { r: result, missingMods: missingMods, knownMods: wfcdMods, replacements: replacements,
                 onToggleMissing: toggleMissing, onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput, onRebuild: handleRebuild,
                 onBackToPrev: goBackToPrev, prevScreen: prevScreen,
-                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4442}} )
+                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4442}} )
             )
             , screen === "mission" && (
               React.createElement(MissionResult, { r: result, missingMods: missingMods, knownMods: wfcdMods, missingArcanes: missingArcanes, replacements: replacements,
                 lockedMods: lockedMods, onToggleMissing: toggleMissing, onToggleLock: toggleLock,
                 onGenerate: generate, onWeaponJump: jumpToWeaponBuild, onCompanionJump: jumpToCompanionBuild,
                 onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput, onRebuild: handleRebuild,
-                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4447}} )
+                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4447}} )
             )
             , screen === "evaluate" && (
               evalBuildData && evalBuildData.type === "Riven"
                 ? React.createElement(RivenEvalResult, { r: result, evalBuildData: evalBuildData, onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput })
                 : React.createElement(EvalResult, { r: result, onRebuild: handleRebuild, onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput, evalBuildData: evalBuildData,
-                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4454}} )
+                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4454}} )
             )
           )
         )
