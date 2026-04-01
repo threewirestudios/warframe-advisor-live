@@ -4451,7 +4451,7 @@ function HelminthPicker({ value, onChange }) {
   useEffect(() => { setQ(value || ""); }, [value]);
 
   const matches = HELMINTH_ABILITIES.filter(a =>
-    !q.trim() || a.name.toLowerCase().includes(q.toLowerCase()) || a.frame.toLowerCase().includes(q.toLowerCase()) || a.desc.toLowerCase().includes(q.toLowerCase())
+    !q.trim() || a.name.toLowerCase().includes(q.toLowerCase()) || (a.frame || "").toLowerCase().includes(q.toLowerCase()) || a.desc.toLowerCase().includes(q.toLowerCase())
   );
 
   useEffect(() => {
