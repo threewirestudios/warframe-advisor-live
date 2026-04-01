@@ -3334,9 +3334,7 @@ Return ONLY valid JSON:
 {"companion_weapon":"ExactClawOrWeaponName","belongs_to":"ExactCompanionName","weapon_category":"Beast Claws/Sentinel Weapon","posture":"PostureModName or null","sp_viable":true,"mods":[{"slot":"Posture","name":"PostureName","reason":"short"},{"slot":"1","name":"ModName","reason":"short"}],"forma":0,"build_focus":"Crit/Status/Hybrid/Stealth","playstyle":"1 sentence","strengths":["s1"],"weaknesses":["w1"]}
 NEVER suggest standard melee mods on Beast Claws. NEVER suggest sentinel weapons for beast companions or vice versa.`;
 
-  const _prompts = { FRAME_PROMPT, WEAPON_PROMPT, EXALTED_PROMPT, COMPANION_WEAPON_PROMPT, COMPANION_PROMPT, MISSION_PROMPT };
-  console.log("[Prompt sizes]", Object.fromEntries(Object.entries(_prompts).map(([k,v]) => [k, v.length + " chars (~" + Math.round(v.length/4) + " tokens)"])));
-  return _prompts;
+  return { FRAME_PROMPT, WEAPON_PROMPT, EXALTED_PROMPT, COMPANION_WEAPON_PROMPT, COMPANION_PROMPT, MISSION_PROMPT };
 }
 
 // Builds a scoped EVAL_PROMPT using only the relevant mod category for the thing being evaluated.
