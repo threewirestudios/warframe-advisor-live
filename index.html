@@ -3728,7 +3728,40 @@ function BuildChat({ buildContext, buildType, onRebuild, advisorNotes, onSaveAdv
 }
 
 
-function FrameResult({ r, missingMods, knownMods, missingArcanes, replacements, lockedMods, onToggleMissing, onToggleLock, onGenerate, onWeaponJump, onCompanionJump, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, savedBuilds }) {
+function StylePills({ buildStyle, onSwitchStyle }) {
+  var ps = [
+    { key: "my_style", label: "My Style", color: "#00d4aa" },
+    { key: "the_stig", label: "The Stig", color: "#c8e0f0" },
+    { key: "ninjase",  label: "ninjase",  color: "#ffaa44" },
+    { key: "brozime",  label: "Brozime",  color: "#88cc66" },
+    { key: "iflynn",   label: "iFlynn",   color: "#4499ff" },
+    { key: "leyzar",   label: "Leyzar",   color: "#ddaa44" },
+  ];
+  return React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 14, padding: "8px 12px", background: "#060e1a", borderRadius: 8, border: "1px solid #1a3050" } },
+    React.createElement("span", { style: { fontSize: 10, color: "#6a9fc8", letterSpacing: "0.15em", textTransform: "uppercase", fontFamily: "'Electrolize',monospace", marginRight: 6 } }, "Style:"),
+    ps.map(function(p) {
+      var active = buildStyle === p.key;
+      return React.createElement("button", {
+        key: p.key,
+        onClick: function() { if (!active) onSwitchStyle(p.key); },
+        style: {
+          background: active ? p.color + "22" : "transparent",
+          border: "1px solid " + (active ? p.color + "88" : "#1a3050"),
+          borderRadius: 4,
+          color: active ? p.color : "#3a6a8a",
+          padding: "2px 8px",
+          cursor: active ? "default" : "pointer",
+          fontSize: 10,
+          fontFamily: "'Electrolize',monospace",
+          letterSpacing: "0.08em",
+          fontWeight: active ? 700 : 400,
+          transition: "all 0.15s"
+        }
+      }, p.label);
+    })
+  );
+}
+function FrameResult({ r, missingMods, knownMods, missingArcanes, replacements, lockedMods, onToggleMissing, onToggleLock, onGenerate, onWeaponJump, onCompanionJump, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, savedBuilds, buildStyle, onSwitchStyle }) {
   const [tauShards, setTauShards] = useState({});  // index → boolean, click to toggle tau
   const shardColors = { Crimson: "#ff5555", Azure: "#4a9eff", Amber: "#ffaa00", Violet: "#aa44ff", Topaz: "#ffdd44", Emerald: "#44dd88" };
   // parseShardBonus is the top-level function defined above SHARD_REF
@@ -3736,6 +3769,7 @@ function FrameResult({ r, missingMods, knownMods, missingArcanes, replacements, 
   const allMissing = [...missingMods, ...missingArcanes];
   return (
     React.createElement('div', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 1635}}
+      , React.createElement(StylePills, { buildStyle: buildStyle, onSwitchStyle: onSwitchStyle })
       , React.createElement('div', { style: { display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1636}}
         , React.createElement('div', { style: { flex: 1, minWidth: 200, background: "#0a1628", border: "1px solid #1a3050", borderRadius: 12, padding: "16px 20px" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1637}}
           , React.createElement('div', { style: { fontSize: 24, fontWeight: 900, color: "#00d4aa", letterSpacing: "0.05em" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1638}}, r.frame)
@@ -3907,12 +3941,13 @@ function FrameResult({ r, missingMods, knownMods, missingArcanes, replacements, 
   );
 }
 
-function WeaponResult({ r, missingMods, knownMods, missingArcanes, replacements, onToggleMissing, onSave, saveNameInput, setSaveNameInput, onRebuild, onBuildWithRiven, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, buildStyle, onBackToPrev, prevScreen, savedBuilds }) {
+function WeaponResult({ r, missingMods, knownMods, missingArcanes, replacements, onToggleMissing, onSave, saveNameInput, setSaveNameInput, onRebuild, onBuildWithRiven, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, buildStyle, onBackToPrev, prevScreen, savedBuilds, onSwitchStyle }) {
   const [tauShards, setTauShards] = useState({});
   const shardColors = { Crimson: "#ff5555", Azure: "#4a9eff", Amber: "#ffaa00", Violet: "#aa44ff", Topaz: "#ffdd44", Emerald: "#44dd88" };
   return (
     React.createElement('div', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 1809}}
       , onBackToPrev && React.createElement('button', { onClick: onBackToPrev, style: { background: "#0a1628", border: "1px solid #1a3050", borderRadius: 0, clipPath: "polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))", color: "#6a9fc8", padding: "8px 14px", cursor: "pointer", fontSize: 11, fontFamily: "'Electrolize',monospace", letterSpacing: "0.06em", marginBottom: 12, display: "block" } }, "\u25c2 BACK TO " + (prevScreen === "mission" ? "MISSION BUILD" : prevScreen === "frame" ? "FRAME BUILD" : "PREVIOUS"))
+      , React.createElement(StylePills, { buildStyle: buildStyle, onSwitchStyle: onSwitchStyle })
       , React.createElement('div', { style: { display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1810}}
         , React.createElement('div', { style: { flex: 1, minWidth: 200, background: "#0a1628", border: `1px solid ${r.type === "Exalted" ? "#00d4aa44" : "#1a3050"}`, borderRadius: 12, padding: "16px 20px" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1811}}
           , r.type === "Exalted" && React.createElement('div', { style: { fontSize: 9, color: "#00d4aa", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 4 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1812}}, "✦ Exalted Weapon"  )
@@ -4115,7 +4150,7 @@ function WeaponResult({ r, missingMods, knownMods, missingArcanes, replacements,
   );
 }
 
-function CompanionResult({ r, missingMods, knownMods, replacements, onToggleMissing, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, onBackToPrev, prevScreen, savedBuilds }) {
+function CompanionResult({ r, missingMods, knownMods, replacements, onToggleMissing, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, onBackToPrev, prevScreen, savedBuilds, buildStyle, onSwitchStyle }) {
   const isBeast = ["Kavat","Kubrow","Vulpaphyla","Predasite"].some(t => (r.type || "").includes(t));
   const isSentinel = (r.type || "").includes("Sentinel");
   const weaponCat = _optionalChain([r, 'access', _6 => _6.companion_weapon, 'optionalAccess', _7 => _7.weapon_category]) || (isBeast ? "Beast Claws" : isSentinel ? "Sentinel Weapon" : null);
@@ -4123,6 +4158,7 @@ function CompanionResult({ r, missingMods, knownMods, replacements, onToggleMiss
   return (
     React.createElement('div', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 1941}}
 , onBackToPrev && React.createElement('button', { onClick: onBackToPrev, style: { background: "#0a1628", border: "1px solid #1a3050", borderRadius: 0, clipPath: "polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))", color: "#6a9fc8", padding: "8px 14px", cursor: "pointer", fontSize: 11, fontFamily: "'Electrolize',monospace", letterSpacing: "0.06em", marginBottom: 12, display: "block" } }, "\u25c2 BACK TO " + (prevScreen === "mission" ? "MISSION BUILD" : prevScreen === "frame" ? "FRAME BUILD" : "PREVIOUS"))
+      , React.createElement(StylePills, { buildStyle: buildStyle, onSwitchStyle: onSwitchStyle })
       , React.createElement('div', { style: { background: "#0a1628", border: "1px solid #ffaa4433", borderRadius: 12, padding: "16px 20px", marginBottom: 16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1942}}
         , React.createElement('div', { style: { fontSize: 24, fontWeight: 900, color: "#ffaa44" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1943}}, r.companion)
         , React.createElement('div', { style: { color: "#aa7a44", fontSize: 13, marginTop: 4 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1944}}, r.type, " · "  , r.role)
@@ -4181,12 +4217,13 @@ function CompanionResult({ r, missingMods, knownMods, replacements, onToggleMiss
     )
   );
 }
-function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements, lockedMods, onToggleMissing, onToggleLock, onGenerate, onWeaponJump, onCompanionJump, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, savedBuilds }) {
+function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements, lockedMods, onToggleMissing, onToggleLock, onGenerate, onWeaponJump, onCompanionJump, onSave, saveNameInput, setSaveNameInput, onRebuild, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, savedBuilds, buildStyle, onSwitchStyle }) {
   const [missionTauShards, setMissionTauShards] = useState({});
   const shardColors = { Crimson: "#ff5555", Azure: "#4a9eff", Amber: "#ffaa00", Violet: "#aa44ff", Topaz: "#ffdd44", Emerald: "#44dd88" };
   const allMissing = [...missingMods, ...missingArcanes];
   return (
     React.createElement('div', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 2005}}
+      , React.createElement(StylePills, { buildStyle: buildStyle, onSwitchStyle: onSwitchStyle })
       /* Mission header */
       , React.createElement('div', { style: { background: "#0a1628", border: "1px solid #1a3050", borderRadius: 0, clipPath:"polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px))", padding: "16px 20px", marginBottom: 16, position:"relative" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2007}}
         , React.createElement('div', { style: { position:"absolute",top:0,left:0,right:0,height:"1px",background:"linear-gradient(90deg,transparent,#aa44ff88,transparent)" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2008}} )
@@ -4361,7 +4398,7 @@ function MissionResult({ r, missingMods, knownMods, missingArcanes, replacements
   );
 }
 
-function EvalResult({ r, onRebuild, onSave, saveNameInput, setSaveNameInput, evalBuildData, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, savedBuilds }) {
+function EvalResult({ r, onRebuild, onSave, saveNameInput, setSaveNameInput, evalBuildData, advisorNotes, onSaveAdvisorNotes, customMods, onSaveCustomMods, wfcdMods, savedBuilds, buildStyle, onSwitchStyle }) {
   if (!r) return null;
   const gradeColor = { S: "#ffd700", A: "#00d4aa", B: "#6a9fc8", C: "#ff8800", D: "#ff4444" }[r.grade] || "#6a9fc8";
   // Derive the subject name — from eval data or fallback to frame key
@@ -4369,6 +4406,7 @@ function EvalResult({ r, onRebuild, onSave, saveNameInput, setSaveNameInput, eva
   const subjectSub = _optionalChain([evalBuildData, 'optionalAccess', _13 => _13.weapon]) ? `${evalBuildData.type || ""} Weapon` : _optionalChain([evalBuildData, 'optionalAccess', _14 => _14.companion]) ? `Companion · ${evalBuildData.type || ""}` : null;
   return (
     React.createElement('div', { style: { padding: "0 4px" }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2152}}
+      , React.createElement(StylePills, { buildStyle: buildStyle, onSwitchStyle: onSwitchStyle })
       , React.createElement('div', { style: { background: "#0a1628", border: `1px solid ${gradeColor}44`, borderRadius: 12, padding: "20px 24px", marginBottom: 16 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2153}}
         , React.createElement('div', { style: { display: "flex", alignItems: "center", gap: 16, marginBottom: 12 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2154}}
           , React.createElement('div', { style: { fontSize: 48, fontWeight: 900, color: gradeColor, fontFamily: "'Electrolize',monospace", lineHeight: 1, minWidth: 56 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 2155}}, r.grade || "?")
@@ -6602,6 +6640,7 @@ ${styleCtx}`;
     }
   }, [prevScreen, prevResult]);
 
+  const handleSwitchStyle = useCallback((newStyle) => { stateRef.current = Object.assign({}, stateRef.current, { buildStyle: newStyle }); setBuildStyle(newStyle); storageSet("buildStyle", newStyle); generate(stateRef.current.screen); }, [generate]);
   const screenLabel = { frame: "Warframe", weapon: "Weapon", companion: "Companion", mission: "Mission", evaluate: "Evaluate", riven_compare: "Compare Rivens" };
   const evalScreenLabel = evalType ? `Evaluate · ${evalType}` : "Evaluate";
 
@@ -7754,32 +7793,32 @@ ${styleCtx}`;
                 lockedMods: lockedMods, onToggleMissing: toggleMissing, onToggleLock: toggleLock,
                 onGenerate: generate, onWeaponJump: jumpToWeaponBuild, onCompanionJump: jumpToCompanionBuild,
                 onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput, onRebuild: handleRebuild,
-                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4430}} )
+                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, buildStyle: buildStyle, onSwitchStyle: handleSwitchStyle, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4430}} )
             )
             , screen === "weapon" && (
               React.createElement(WeaponResult, { r: result, missingMods: missingMods, knownMods: wfcdMods, missingArcanes: missingArcanes, replacements: replacements,
                 onToggleMissing: toggleMissing, onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput, onRebuild: handleRebuild, onBuildWithRiven: handleBuildWithRiven, buildStyle: buildStyle,
                 onBackToPrev: goBackToPrev, prevScreen: prevScreen,
-                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4437}} )
+                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, onSwitchStyle: handleSwitchStyle, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4437}} )
             )
             , screen === "companion" && (
               React.createElement(CompanionResult, { r: result, missingMods: missingMods, knownMods: wfcdMods, replacements: replacements,
                 onToggleMissing: toggleMissing, onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput, onRebuild: handleRebuild,
                 onBackToPrev: goBackToPrev, prevScreen: prevScreen,
-                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4442}} )
+                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, buildStyle: buildStyle, onSwitchStyle: handleSwitchStyle, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4442}} )
             )
             , screen === "mission" && (
               React.createElement(MissionResult, { r: result, missingMods: missingMods, knownMods: wfcdMods, missingArcanes: missingArcanes, replacements: replacements,
                 lockedMods: lockedMods, onToggleMissing: toggleMissing, onToggleLock: toggleLock,
                 onGenerate: generate, onWeaponJump: jumpToWeaponBuild, onCompanionJump: jumpToCompanionBuild,
                 onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput, onRebuild: handleRebuild,
-                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4447}} )
+                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, buildStyle: buildStyle, onSwitchStyle: handleSwitchStyle, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4447}} )
             )
             , screen === "evaluate" && (
               evalBuildData && evalBuildData.type === "Riven"
                 ? React.createElement(RivenEvalResult, { r: result, evalBuildData: evalBuildData, onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput })
                 : React.createElement(EvalResult, { r: result, onRebuild: handleRebuild, onSave: saveToLibrary, saveNameInput: saveNameInput, setSaveNameInput: setSaveNameInput, evalBuildData: evalBuildData,
-                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4454}} )
+                advisorNotes: advisorNotes, onSaveAdvisorNotes: saveAdvisorNotes, customMods: customMods, onSaveCustomMods: saveCustomMods, wfcdMods: wfcdMods, buildStyle: buildStyle, onSwitchStyle: handleSwitchStyle, savedBuilds: savedBuilds, __self: this, __source: {fileName: _jsxFileName, lineNumber: 4454}} )
             )
           )
         )
