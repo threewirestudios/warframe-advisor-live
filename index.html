@@ -991,7 +991,8 @@ function parseWfcdMod(m) {
     ? stats[stats.length - 1].stats.join("; ").replace(/\r\n/g, " ").replace(/\n/g, " ").slice(0, 120)
     : (m.description || "");
   const slot = m.isExilus ? "exilus" : (rawType === "AURA" ? "aura" : "general");
-  return { slot, type, desc, isAugment: !!m.isAugment, isPrime: !!m.isPrime };
+  const frameCompat = (m.isAugment && !WFCD_TYPE_MAP[(m.compatName||"").toUpperCase()]) ? (m.compatName||"").toUpperCase() : null;
+  return { slot, type, desc, isAugment: !!m.isAugment, isPrime: !!m.isPrime, frameCompat };
 }
 
 // Build category-filtered mod ref string for prompt injection
@@ -1030,7 +1031,7 @@ const PRIORITY_MODS = new Set([
   "Natural Talent","Speed Drift","Empowered Blades","Motus Setup","Reactive Storm",
 ]);
 
-function buildModRefString(wfcdMods, category, arcaneDb, advisorNotes, customMods) {
+function buildModRefString(wfcdMods, category, arcaneDb, advisorNotes, customMods, hints) {
   const relevantTypes = {
     warframe:  ["warframe"],
     weapon:    ["primary", "secondary", "melee"],
@@ -1041,9 +1042,11 @@ function buildModRefString(wfcdMods, category, arcaneDb, advisorNotes, customMod
     mission:   ["warframe", "primary", "secondary", "melee"],
   }[category] || ["warframe", "primary", "secondary", "melee"];
 
+  const _frameKey = (hints && hints.frameName) ? hints.frameName.toUpperCase().replace(/\s*(PRIME|UMBRA)\s*/gi, "").trim() : null;
   const filtered = Object.entries(wfcdMods)
     .filter(([, v]) => relevantTypes.includes(v.type))
-    .filter(([name]) => !name.includes("Stance") && !name.includes("Naramon") && !name.includes("Vazarin") && !name.includes("Drift"));
+    .filter(([name]) => !name.includes("Stance") && !name.includes("Naramon") && !name.includes("Vazarin") && !name.includes("Drift"))
+    .filter(([, v]) => !_frameKey || !v.isAugment || !v.frameCompat || v.frameCompat === _frameKey);
 
   // Priority mods get full details. Everything else gets name+tags only.
   // This gives the AI complete mod name coverage while keeping tokens reasonable.
@@ -1068,7 +1071,17 @@ function buildModRefString(wfcdMods, category, arcaneDb, advisorNotes, customMod
 
   const allEntries = [...priorityEntries, ...otherEntries];
 
+  const _arcaneAllowed = {
+    warframe:  ["warframe"],
+    weapon:    ["warframe","primary","secondary","melee"],
+    primary:   ["warframe","primary"],
+    secondary: ["warframe","secondary"],
+    melee:     ["warframe","melee"],
+    companion: ["warframe"],
+    mission:   ["warframe","primary","secondary","melee"],
+  }[category] || ["warframe","primary","secondary","melee"];
   const arcaneEntries = Object.entries(arcaneDb)
+    .filter(([, d]) => _arcaneAllowed.includes(d.type))
     .map(([n, d]) => `- ${n} [${d.type}]: ${d.desc}`);
 
   // User-taught custom mods — always full details
@@ -2228,8 +2241,8 @@ function parseShardBonus(color, bonusText) {
 // Called at generate-time with live wfcdMods — gives AI the full WFCD mod list
 // filtered to the relevant category instead of the old 60-mod static fallback.
 // buildModRef: convenience wrapper that includes ARCANE_DB automatically
-function buildModRef(wfcdMods, category, advisorNotes, customMods, wfcdArcanes) {
-  return buildModRefString(wfcdMods, category, { ...ARCANE_DB, ...(wfcdArcanes||{}) }, advisorNotes, customMods);
+function buildModRef(wfcdMods, category, advisorNotes, customMods, wfcdArcanes, hints) {
+  return buildModRefString(wfcdMods, category, { ...ARCANE_DB, ...(wfcdArcanes||{}) }, advisorNotes, customMods, hints);
 }
 
 // === FRAME KIT DATABASE ===
@@ -3078,7 +3091,7 @@ function getRivenPriorities(weaponType, weaponName, buildStyle) {
 
 function buildPrompts(wfcdMods, advisorNotes, customMods, wfcdArcanes, hints) {
   const weaponCategory = (hints && hints.weaponType && hints.weaponType !== "auto") ? hints.weaponType : "weapon";
-  const frameRef  = buildModRef(wfcdMods, "warframe",     advisorNotes, customMods, wfcdArcanes);
+  const frameRef  = buildModRef(wfcdMods, "warframe",     advisorNotes, customMods, wfcdArcanes, hints);
   const weaponRef = buildModRef(wfcdMods, weaponCategory,   advisorNotes, customMods, wfcdArcanes);
   const compRef   = buildModRef(wfcdMods, "companion",    advisorNotes, customMods, wfcdArcanes);
   const missRef   = buildModRef(wfcdMods, "mission",      advisorNotes, customMods, wfcdArcanes);
@@ -6293,7 +6306,8 @@ function WarframeAdvisor() {
     const promptNotes = isStig ? "" : (s.advisorNotes || "");
     const styleCtx = getStyleContext(s.buildStyle || "my_style");
     const _wTypeHint = (s.weaponType && s.weaponType !== "auto" && s.weaponType !== "Exalted") ? s.weaponType.toLowerCase() : null;
-    const { FRAME_PROMPT, WEAPON_PROMPT, EXALTED_PROMPT, COMPANION_WEAPON_PROMPT, COMPANION_PROMPT, MISSION_PROMPT } = buildPrompts(s.wfcdMods || {}, promptNotes, s.customMods || {}, s.wfcdArcanes || {}, { weaponType: _wTypeHint });
+    const _fNameHint = (s.frameSearch && s.frameSearch.trim()) ? s.frameSearch.trim() : null;
+    const { FRAME_PROMPT, WEAPON_PROMPT, EXALTED_PROMPT, COMPANION_WEAPON_PROMPT, COMPANION_PROMPT, MISSION_PROMPT } = buildPrompts(s.wfcdMods || {}, promptNotes, s.customMods || {}, s.wfcdArcanes || {}, { weaponType: _wTypeHint, frameName: _fNameHint });
     const EVAL_PROMPT = buildEvalPrompt(s.wfcdMods || {}, s.evalType || "Warframe", promptNotes, s.customMods || {});
     setLoading(true); setError(null); setResult(null);
     try {
